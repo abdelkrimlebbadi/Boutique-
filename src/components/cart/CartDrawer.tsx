@@ -8,6 +8,7 @@ import { useCart } from "./CartProvider";
 import { updateCartItemQuantity, removeCartItem } from "@/actions/cart";
 import { formatMoney } from "@/lib/currency/format-money";
 import { Input } from "@/components/ui/Input";
+import { Link } from "@/i18n/navigation";
 
 export function CartDrawer() {
   const t = useTranslations("cart");
@@ -109,10 +110,17 @@ export function CartDrawer() {
 
           {cart.items.length > 0 && (
             <div className="border-t border-neutral-200 px-5 py-4">
-              <div className="flex justify-between font-display text-lg font-semibold">
+              <div className="mb-4 flex justify-between font-display text-lg font-semibold">
                 <span>{t("subtotal")}</span>
                 <span>{formatMoney(cart.subtotalCents, cart.currency, locale)}</span>
               </div>
+              <Link
+                href="/checkout"
+                onClick={close}
+                className="flex h-12 w-full items-center justify-center bg-neutral-900 font-body font-medium text-neutral-0 transition-colors duration-(--duration-base) ease-(--ease-standard) hover:bg-accent-600 active:bg-accent-700"
+              >
+                {t("checkout")}
+              </Link>
             </div>
           )}
         </Dialog.Content>

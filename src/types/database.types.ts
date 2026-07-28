@@ -65,6 +65,7 @@ export type Database = {
           {
             foreignKeyName: "addresses_customer_id_fkey"
             columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -99,12 +100,14 @@ export type Database = {
           {
             foreignKeyName: "cart_items_cart_id_fkey"
             columns: ["cart_id"]
+            isOneToOne: false
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cart_items_variant_id_fkey"
             columns: ["variant_id"]
+            isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
@@ -139,6 +142,7 @@ export type Database = {
           {
             foreignKeyName: "carts_customer_id_fkey"
             columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -173,6 +177,7 @@ export type Database = {
           {
             foreignKeyName: "categories_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
@@ -207,6 +212,7 @@ export type Database = {
           {
             foreignKeyName: "category_translations_category_id_fkey"
             columns: ["category_id"]
+            isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
@@ -361,24 +367,28 @@ export type Database = {
           {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "product_catalog"
             referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "order_items_variant_id_fkey"
             columns: ["variant_id"]
+            isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
@@ -387,6 +397,7 @@ export type Database = {
       orders: {
         Row: {
           billing_address: Json | null
+          carrier: string | null
           contact_email: string
           contact_phone: string | null
           created_at: string
@@ -405,10 +416,13 @@ export type Database = {
           subtotal_cents: number
           tax_cents: number
           total_cents: number
+          tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
         }
         Insert: {
           billing_address?: Json | null
+          carrier?: string | null
           contact_email: string
           contact_phone?: string | null
           created_at?: string
@@ -427,10 +441,13 @@ export type Database = {
           subtotal_cents: number
           tax_cents: number
           total_cents: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Update: {
           billing_address?: Json | null
+          carrier?: string | null
           contact_email?: string
           contact_phone?: string | null
           created_at?: string
@@ -449,18 +466,22 @@ export type Database = {
           subtotal_cents?: number
           tax_cents?: number
           total_cents?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "orders_customer_id_fkey"
             columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "orders_discount_code_id_fkey"
             columns: ["discount_code_id"]
+            isOneToOne: false
             referencedRelation: "discount_codes"
             referencedColumns: ["id"]
           },
@@ -498,6 +519,7 @@ export type Database = {
           {
             foreignKeyName: "prices_variant_id_fkey"
             columns: ["variant_id"]
+            isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
@@ -520,18 +542,21 @@ export type Database = {
           {
             foreignKeyName: "product_categories_category_id_fkey"
             columns: ["category_id"]
+            isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "product_categories_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "product_catalog"
             referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "product_categories_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -566,12 +591,14 @@ export type Database = {
           {
             foreignKeyName: "product_images_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "product_catalog"
             referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "product_images_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -609,12 +636,14 @@ export type Database = {
           {
             foreignKeyName: "product_translations_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "product_catalog"
             referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "product_translations_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -661,12 +690,14 @@ export type Database = {
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "product_catalog"
             referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -740,6 +771,7 @@ export type Database = {
           {
             foreignKeyName: "shipping_rates_zone_id_fkey"
             columns: ["zone_id"]
+            isOneToOne: false
             referencedRelation: "shipping_zones"
             referencedColumns: ["id"]
           },
@@ -859,7 +891,65 @@ export type Database = {
       }
     }
     Functions: {
+      claim_webhook_event: {
+        Args: {
+          p_external_id: string
+          p_payload: Json
+          p_provider: Database["public"]["Enums"]["webhook_provider"]
+        }
+        Returns: string
+      }
       cleanup_stale_anonymous_users: { Args: never; Returns: undefined }
+      create_order_with_items: {
+        Args: {
+          p_billing_address: Json
+          p_cart_id: string
+          p_contact_email: string
+          p_contact_phone: string
+          p_currency: string
+          p_customer_id: string
+          p_discount_cents: number
+          p_discount_code_id: string
+          p_items: Json
+          p_payment_provider: Database["public"]["Enums"]["payment_provider"]
+          p_shipping_address: Json
+          p_shipping_cents: number
+          p_subtotal_cents: number
+          p_tax_cents: number
+          p_total_cents: number
+        }
+        Returns: {
+          billing_address: Json | null
+          carrier: string | null
+          contact_email: string
+          contact_phone: string | null
+          created_at: string
+          currency: string
+          customer_id: string
+          discount_cents: number
+          discount_code_id: string | null
+          id: string
+          order_number: string
+          payment_provider: Database["public"]["Enums"]["payment_provider"]
+          payment_ref: string | null
+          printful_order_id: string | null
+          shipping_address: Json
+          shipping_cents: number
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal_cents: number
+          tax_cents: number
+          total_cents: number
+          tracking_number: string | null
+          tracking_url: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       validate_discount_code: {
         Args: { p_code: string }
         Returns: {
@@ -883,10 +973,10 @@ export type Database = {
         | "cancelled"
         | "refunded"
         | "failed"
-      payment_provider: "paypal" | "youcan_pay"
+      payment_provider: "paypal" | "youcan_pay" | "mock"
       product_status: "draft" | "active" | "archived"
       stock_policy: "made_to_order" | "in_stock" | "out_of_stock"
-      webhook_provider: "paypal" | "youcan_pay" | "printful"
+      webhook_provider: "paypal" | "youcan_pay" | "printful" | "mock"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1023,11 +1113,10 @@ export const Constants = {
         "refunded",
         "failed",
       ],
-      payment_provider: ["paypal", "youcan_pay"],
+      payment_provider: ["paypal", "youcan_pay", "mock"],
       product_status: ["draft", "active", "archived"],
       stock_policy: ["made_to_order", "in_stock", "out_of_stock"],
-      webhook_provider: ["paypal", "youcan_pay", "printful"],
+      webhook_provider: ["paypal", "youcan_pay", "printful", "mock"],
     },
   },
 } as const
-

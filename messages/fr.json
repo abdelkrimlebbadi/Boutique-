@@ -35,7 +35,8 @@
     "subtotal": "Sous-total",
     "quantity": "Quantité",
     "remove": "Retirer",
-    "close": "Fermer le panier"
+    "close": "Fermer le panier",
+    "checkout": "Passer commande"
   },
   "product": {
     "addToCart": "Ajouter au panier",
@@ -75,5 +76,92 @@
     "resultsCount": "{count} résultat(s) pour « {query} »",
     "noResults": "Aucun résultat pour « {query} ».",
     "prompt": "Commencez à taper pour rechercher."
+  },
+  "checkout": {
+    "steps": {
+      "cart": "Panier",
+      "address": "Adresse",
+      "shipping": "Livraison",
+      "payment": "Paiement",
+      "confirmation": "Confirmation"
+    },
+    "cart": {
+      "title": "Votre panier",
+      "empty": "Votre panier est vide.",
+      "browseCta": "Découvrir la boutique",
+      "subtotal": "Sous-total",
+      "continueCta": "Continuer"
+    },
+    "address": {
+      "title": "Adresse de livraison",
+      "contactEmail": "E-mail",
+      "fullName": "Nom complet",
+      "line1": "Adresse",
+      "line2": "Complément d'adresse",
+      "city": "Ville",
+      "state": "Région / État",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "phone": "Téléphone",
+      "billingSameAsShipping": "Utiliser la même adresse pour la facturation",
+      "billingTitle": "Adresse de facturation",
+      "saving": "Enregistrement...",
+      "continueCta": "Continuer vers la livraison",
+      "error": "Impossible d'enregistrer l'adresse. Veuillez réessayer."
+    },
+    "shipping": {
+      "title": "Mode de livraison",
+      "noRate": "Aucun tarif de livraison disponible pour cette adresse.",
+      "continueCta": "Continuer vers le paiement"
+    },
+    "payment": {
+      "title": "Paiement",
+      "discountCodePlaceholder": "Code promo",
+      "applyCta": "Appliquer",
+      "removeCta": "Retirer",
+      "discountApplied": "Code {code} appliqué",
+      "discountInvalid": "Ce code promo n'est pas valide.",
+      "payCta": "Payer",
+      "paying": "Redirection...",
+      "cancelled": "Le paiement a été annulé. Vous pouvez réessayer.",
+      "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+      "errorMissingPrice": "Certains articles de votre panier ne sont plus disponibles.",
+      "errorNoShipping": "Aucun tarif de livraison disponible pour cette adresse.",
+      "errorInvalidDiscount": "Ce code promo n'est plus valide.",
+      "errorOrderCreation": "Impossible de créer la commande. Veuillez réessayer.",
+      "errorPaymentSession": "Impossible d'initier le paiement. Veuillez réessayer."
+    },
+    "mockPay": {
+      "title": "Paiement de démonstration",
+      "description": "Montant à régler : {amount}",
+      "simulateSuccess": "Simuler un paiement réussi",
+      "simulateFailure": "Simuler un échec de paiement",
+      "error": "La simulation a échoué. Veuillez réessayer."
+    },
+    "confirmation": {
+      "title": "Merci pour votre commande !",
+      "orderNumber": "Commande {number}",
+      "statusPending": "Paiement en cours de confirmation...",
+      "statusPendingChecking": "Vérification du paiement...",
+      "statusPendingReassurance": "La confirmation peut prendre quelques minutes ; vous recevrez un e-mail dès que le paiement sera confirmé.",
+      "statusPaid": "Paiement confirmé.",
+      "statusProcessing": "Commande en cours de préparation.",
+      "statusShipped": "Commande expédiée.",
+      "statusFailed": "Le paiement a échoué.",
+      "statusDefault": "Statut de la commande mis à jour.",
+      "itemsHeading": "Articles",
+      "subtotal": "Sous-total",
+      "shipping": "Livraison",
+      "discount": "Remise",
+      "total": "Total",
+      "retryPayment": "Réessayer le paiement",
+      "backToShop": "Retour à la boutique"
+    },
+    "summary": {
+      "subtotal": "Sous-total",
+      "shipping": "Livraison",
+      "discount": "Remise",
+      "total": "Total"
+    }
   }
 }

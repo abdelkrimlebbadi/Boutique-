@@ -53,17 +53,32 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 ├── open-next.config.ts      # Config adaptateur @opennextjs/cloudflare
 ├── next.config.ts
 ├── src/
-│   ├── app/                 # App Router : pages, layouts, route handlers
+│   ├── app/
+│   │   ├── [locale]/        # Pages, layouts (App Router, next-intl)
+│   │   │   └── checkout/    # Tunnel : cart → address → shipping → payment → mock-pay → confirmation
+│   │   └── api/
+│   │       └── webhooks/[provider]/route.ts   # Seule route API du projet (paiement + Printful)
 │   ├── components/          # Composants UI partagés
-│   ├── actions/             # Server Actions (mutations)
+│   │   └── checkout/        # CheckoutSteps, CheckoutAddressForm, DiscountCodeForm, OrderSummary, ...
+│   ├── actions/              # Server Actions (mutations)
+│   │   └── checkout.ts       # saveCheckoutAddress, applyDiscountCode, startPayment, ...
 │   ├── lib/
-│   │   ├── supabase/        # Clients Supabase (server/browser)
-│   │   ├── printful/        # Intégration fulfillment
-│   │   ├── paypal/          # Intégration paiement PayPal
-│   │   ├── youcan-pay/      # Intégration paiement YouCan Pay
-│   │   ├── resend/          # Emails transactionnels
-│   │   └── validation/      # Schémas zod partagés
+│   │   ├── supabase/         # Clients Supabase (anon + service_role)
+│   │   ├── payments/          # Couche d'abstraction PaymentProvider (types, sélection, Mock)
+│   │   ├── printful/          # Intégration fulfillment (création commande + webhook expédition)
+│   │   ├── paypal/            # Intégration paiement PayPal (Orders API v2)
+│   │   ├── youcan-pay/        # Intégration paiement YouCan Pay (confiance faible, voir commentaires)
+│   │   ├── resend/            # Emails transactionnels (client, envois, templates React Email)
+│   │   ├── checkout/          # Tunnel : pricing serveur, cookies d'état, orchestration webhooks
+│   │   └── validation/        # Schémas zod partagés
 │   └── types/                # Types partagés
 ├── public/
 └── ...fichiers de config (tsconfig.json, eslint.config.mjs, postcss.config.mjs, package.json)
 ```
+
+## Paiement — couche d'abstraction
+
+- `PaymentProvider` (`src/lib/payments/types.ts`) : interface unique (`createSession`, `verifyWebhook`, `refund`) implémentée par `PayPalProvider`, `YouCanPayProvider`, `MockProvider`. **Aucun code métier n'importe une implémentation concrète** — tout passe par `src/lib/payments/select-provider.ts` (`selectPaymentProvider(countryCode)` / `getPaymentProviderByName(name)`), qui choisit selon `PAYMENT_PROVIDER` (override) sinon le pays de livraison (`MA` → YouCan Pay, sinon PayPal).
+- Le total d'une commande est recalculé intégralement côté serveur (`src/lib/checkout/compute-order-pricing.ts`) avant toute création de commande ou paiement — jamais de confiance dans un montant venu du client.
+- `orders` est créée `pending` avant redirection vers le provider, via la fonction Postgres atomique `create_order_with_items` (service_role uniquement, `EXECUTE` révoqué pour `anon`/`authenticated`).
+- Webhooks (`/api/webhooks/[provider]`, paiement + Printful) : idempotents via `claim_webhook_event` (RPC service_role, révoquée pour `anon`/`authenticated`), clé `(provider, external_id)`.

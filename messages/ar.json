@@ -35,7 +35,8 @@
     "subtotal": "المجموع الفرعي",
     "quantity": "الكمية",
     "remove": "إزالة",
-    "close": "إغلاق السلة"
+    "close": "إغلاق السلة",
+    "checkout": "إتمام الشراء"
   },
   "product": {
     "addToCart": "أضف إلى السلة",
@@ -75,5 +76,92 @@
     "resultsCount": "{count} نتيجة لـ «{query}»",
     "noResults": "لا توجد نتائج لـ «{query}».",
     "prompt": "ابدأ الكتابة للبحث."
+  },
+  "checkout": {
+    "steps": {
+      "cart": "السلة",
+      "address": "العنوان",
+      "shipping": "الشحن",
+      "payment": "الدفع",
+      "confirmation": "التأكيد"
+    },
+    "cart": {
+      "title": "سلتك",
+      "empty": "سلتك فارغة.",
+      "browseCta": "تصفح المتجر",
+      "subtotal": "المجموع الفرعي",
+      "continueCta": "متابعة"
+    },
+    "address": {
+      "title": "عنوان الشحن",
+      "contactEmail": "البريد الإلكتروني",
+      "fullName": "الاسم الكامل",
+      "line1": "العنوان",
+      "line2": "تفاصيل إضافية للعنوان",
+      "city": "المدينة",
+      "state": "الجهة / الولاية",
+      "postalCode": "الرمز البريدي",
+      "country": "البلد",
+      "phone": "الهاتف",
+      "billingSameAsShipping": "استخدام نفس العنوان للفوترة",
+      "billingTitle": "عنوان الفوترة",
+      "saving": "جارٍ الحفظ...",
+      "continueCta": "المتابعة إلى الشحن",
+      "error": "تعذر حفظ العنوان. يرجى المحاولة مرة أخرى."
+    },
+    "shipping": {
+      "title": "طريقة الشحن",
+      "noRate": "لا يتوفر تعريفة شحن لهذا العنوان.",
+      "continueCta": "المتابعة إلى الدفع"
+    },
+    "payment": {
+      "title": "الدفع",
+      "discountCodePlaceholder": "رمز الخصم",
+      "applyCta": "تطبيق",
+      "removeCta": "إزالة",
+      "discountApplied": "تم تطبيق الرمز {code}",
+      "discountInvalid": "رمز الخصم هذا غير صالح.",
+      "payCta": "الدفع",
+      "paying": "جارٍ التحويل...",
+      "cancelled": "تم إلغاء الدفع. يمكنك المحاولة مرة أخرى.",
+      "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "errorMissingPrice": "بعض المنتجات في سلتك لم تعد متوفرة.",
+      "errorNoShipping": "لا يتوفر تعريفة شحن لهذا العنوان.",
+      "errorInvalidDiscount": "رمز الخصم هذا لم يعد صالحًا.",
+      "errorOrderCreation": "تعذر إنشاء الطلب. يرجى المحاولة مرة أخرى.",
+      "errorPaymentSession": "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى."
+    },
+    "mockPay": {
+      "title": "دفع تجريبي",
+      "description": "المبلغ المستحق: {amount}",
+      "simulateSuccess": "محاكاة عملية دفع ناجحة",
+      "simulateFailure": "محاكاة عملية دفع فاشلة",
+      "error": "فشلت المحاكاة. يرجى المحاولة مرة أخرى."
+    },
+    "confirmation": {
+      "title": "شكرًا لطلبك!",
+      "orderNumber": "الطلب {number}",
+      "statusPending": "جارٍ تأكيد الدفع...",
+      "statusPendingChecking": "جارٍ التحقق من حالة الدفع...",
+      "statusPendingReassurance": "قد يستغرق التأكيد بضع دقائق؛ ستتلقى بريدًا إلكترونيًا فور تأكيد الدفع.",
+      "statusPaid": "تم تأكيد الدفع.",
+      "statusProcessing": "الطلب قيد التحضير.",
+      "statusShipped": "تم شحن الطلب.",
+      "statusFailed": "فشلت عملية الدفع.",
+      "statusDefault": "تم تحديث حالة الطلب.",
+      "itemsHeading": "المنتجات",
+      "subtotal": "المجموع الفرعي",
+      "shipping": "الشحن",
+      "discount": "الخصم",
+      "total": "المجموع",
+      "retryPayment": "إعادة محاولة الدفع",
+      "backToShop": "العودة إلى المتجر"
+    },
+    "summary": {
+      "subtotal": "المجموع الفرعي",
+      "shipping": "الشحن",
+      "discount": "الخصم",
+      "total": "المجموع"
+    }
   }
 }

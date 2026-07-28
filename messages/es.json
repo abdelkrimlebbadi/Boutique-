@@ -35,7 +35,8 @@
     "subtotal": "Subtotal",
     "quantity": "Cantidad",
     "remove": "Quitar",
-    "close": "Cerrar carrito"
+    "close": "Cerrar carrito",
+    "checkout": "Finalizar compra"
   },
   "product": {
     "addToCart": "Añadir al carrito",
@@ -75,5 +76,92 @@
     "resultsCount": "{count} resultado(s) para «{query}»",
     "noResults": "Sin resultados para «{query}».",
     "prompt": "Empieza a escribir para buscar."
+  },
+  "checkout": {
+    "steps": {
+      "cart": "Carrito",
+      "address": "Dirección",
+      "shipping": "Envío",
+      "payment": "Pago",
+      "confirmation": "Confirmación"
+    },
+    "cart": {
+      "title": "Tu carrito",
+      "empty": "Tu carrito está vacío.",
+      "browseCta": "Descubrir la tienda",
+      "subtotal": "Subtotal",
+      "continueCta": "Continuar"
+    },
+    "address": {
+      "title": "Dirección de envío",
+      "contactEmail": "Correo electrónico",
+      "fullName": "Nombre completo",
+      "line1": "Dirección",
+      "line2": "Complemento de dirección",
+      "city": "Ciudad",
+      "state": "Región / Provincia",
+      "postalCode": "Código postal",
+      "country": "País",
+      "phone": "Teléfono",
+      "billingSameAsShipping": "Usar la misma dirección para la facturación",
+      "billingTitle": "Dirección de facturación",
+      "saving": "Guardando...",
+      "continueCta": "Continuar al envío",
+      "error": "No se pudo guardar la dirección. Inténtalo de nuevo."
+    },
+    "shipping": {
+      "title": "Método de envío",
+      "noRate": "No hay tarifa de envío disponible para esta dirección.",
+      "continueCta": "Continuar al pago"
+    },
+    "payment": {
+      "title": "Pago",
+      "discountCodePlaceholder": "Código de descuento",
+      "applyCta": "Aplicar",
+      "removeCta": "Quitar",
+      "discountApplied": "Código {code} aplicado",
+      "discountInvalid": "Este código de descuento no es válido.",
+      "payCta": "Pagar",
+      "paying": "Redirigiendo...",
+      "cancelled": "El pago se canceló. Puedes intentarlo de nuevo.",
+      "errorGeneric": "Ha ocurrido un error. Inténtalo de nuevo.",
+      "errorMissingPrice": "Algunos artículos de tu carrito ya no están disponibles.",
+      "errorNoShipping": "No hay tarifa de envío disponible para esta dirección.",
+      "errorInvalidDiscount": "Este código de descuento ya no es válido.",
+      "errorOrderCreation": "No se pudo crear el pedido. Inténtalo de nuevo.",
+      "errorPaymentSession": "No se pudo iniciar el pago. Inténtalo de nuevo."
+    },
+    "mockPay": {
+      "title": "Pago de demostración",
+      "description": "Importe a pagar: {amount}",
+      "simulateSuccess": "Simular un pago exitoso",
+      "simulateFailure": "Simular un pago fallido",
+      "error": "La simulación falló. Inténtalo de nuevo."
+    },
+    "confirmation": {
+      "title": "¡Gracias por tu pedido!",
+      "orderNumber": "Pedido {number}",
+      "statusPending": "Confirmando el pago...",
+      "statusPendingChecking": "Comprobando el estado del pago...",
+      "statusPendingReassurance": "La confirmación puede tardar unos minutos; recibirás un correo en cuanto se confirme el pago.",
+      "statusPaid": "Pago confirmado.",
+      "statusProcessing": "El pedido se está preparando.",
+      "statusShipped": "Pedido enviado.",
+      "statusFailed": "El pago ha fallado.",
+      "statusDefault": "Estado del pedido actualizado.",
+      "itemsHeading": "Artículos",
+      "subtotal": "Subtotal",
+      "shipping": "Envío",
+      "discount": "Descuento",
+      "total": "Total",
+      "retryPayment": "Reintentar el pago",
+      "backToShop": "Volver a la tienda"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "shipping": "Envío",
+      "discount": "Descuento",
+      "total": "Total"
+    }
   }
 }
