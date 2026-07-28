@@ -1,0 +1,18 @@
+{
+  "common": {
+    "brand": "Boutique"
+  },
+  "localeSwitcher": {
+    "label": "Idioma"
+  },
+  "currencySwitcher": {
+    "label": "Moneda"
+  },
+  "home": {
+    "title": "Bienvenido a Boutique",
+    "subtitle": "Impresión bajo demanda, enviada desde Marruecos a Europa y Norteamérica.",
+    "priceDemoTitle": "Ejemplo de precio convertido",
+    "priceDemoDescription": "Precio base convertido a tu moneda y redondeado psicológicamente.",
+    "ratesUnavailable": "Los tipos de cambio no están disponibles en este momento."
+  }
+}

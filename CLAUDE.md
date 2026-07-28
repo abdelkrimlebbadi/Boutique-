@@ -29,6 +29,21 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 - **Zod pour toute validation d'entrée** : données de formulaires, payloads de Server Actions, webhooks entrants.
 - Pas de commentaires inutiles ; code auto-documenté par des noms explicites.
 
+## Internationalisation
+
+- Locales : `fr` (défaut), `en`, `es`, `ar`. Routing `next-intl` sous `/[locale]/...`, préfixe toujours présent (y compris pour `fr`).
+- Détection de la locale (middleware) : cookie `NEXT_LOCALE` > en-tête `Accept-Language` > `fr` par défaut.
+- `ar` est RTL : `<html dir="rtl">` (voir `getDirection()` dans `src/i18n/routing.ts`). Toujours utiliser les propriétés logiques Tailwind (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) — jamais `ml-`/`mr-`/`pl-`/`pr-`/`left-`/`right-`, qui casseraient le RTL.
+- Traductions en JSON dans `/messages/{locale}.json`.
+
+## Devises
+
+- Devises supportées : `MAD`, `EUR`, `USD`, `GBP`. Devise de base des prix produit : `USD` (table `prices`, ligne `currency = 'USD'`).
+- Taux de change dans `fx_rates` (Postgres), alimentée **uniquement** par le cron GitHub Actions `.github/workflows/fetch-fx-rates.yml` (1×/jour) via `SUPABASE_SERVICE_ROLE_KEY`. **Ne jamais appeler une API de taux de change depuis le front** — toujours lire `fx_rates`/`latest_fx_rates` côté serveur.
+- Prix affiché = prix de base (`USD`) converti avec le dernier taux PUIS arrondi psychologiquement en `x,99` (`psychologicalRoundCents` dans `src/lib/currency/`) — sauf si une ligne `prices` existe déjà explicitement pour la devise cible (override manuel, utilisée telle quelle, jamais re-arrondie).
+- La devise d'une commande (`orders.currency`) est figée à la création et ne doit jamais être recalculée après coup.
+- Devise préférée persistée en cookie `NEXT_CURRENCY`, écrit uniquement via la Server Action `setPreferredCurrency` (jamais en JS client direct).
+
 ## Arborescence du projet
 
 ```

@@ -1,0 +1,18 @@
+{
+  "common": {
+    "brand": "Boutique"
+  },
+  "localeSwitcher": {
+    "label": "Langue"
+  },
+  "currencySwitcher": {
+    "label": "Devise"
+  },
+  "home": {
+    "title": "Bienvenue sur Boutique",
+    "subtitle": "Impression à la demande, expédiée depuis le Maroc vers l'Europe et l'Amérique du Nord.",
+    "priceDemoTitle": "Exemple de prix converti",
+    "priceDemoDescription": "Prix de base converti dans votre devise, puis arrondi psychologiquement.",
+    "ratesUnavailable": "Taux de change indisponibles pour le moment."
+  }
+}

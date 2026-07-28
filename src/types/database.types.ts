@@ -284,6 +284,30 @@ export type Database = {
         }
         Relationships: []
       }
+      fx_rates: {
+        Row: {
+          base_currency: string
+          fetched_at: string
+          id: string
+          quote_currency: string
+          rate: number
+        }
+        Insert: {
+          base_currency: string
+          fetched_at?: string
+          id?: string
+          quote_currency: string
+          rate: number
+        }
+        Update: {
+          base_currency?: string
+          fetched_at?: string
+          id?: string
+          quote_currency?: string
+          rate?: number
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -738,7 +762,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      latest_fx_rates: {
+        Row: {
+          base_currency: string | null
+          fetched_at: string | null
+          quote_currency: string | null
+          rate: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_stale_anonymous_users: { Args: never; Returns: undefined }

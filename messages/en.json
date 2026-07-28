@@ -1,0 +1,18 @@
+{
+  "common": {
+    "brand": "Boutique"
+  },
+  "localeSwitcher": {
+    "label": "Language"
+  },
+  "currencySwitcher": {
+    "label": "Currency"
+  },
+  "home": {
+    "title": "Welcome to Boutique",
+    "subtitle": "Print-on-demand, shipped from Morocco to Europe and North America.",
+    "priceDemoTitle": "Converted price example",
+    "priceDemoDescription": "Base price converted to your currency, then rounded to a charm price.",
+    "ratesUnavailable": "Exchange rates are not available right now."
+  }
+}

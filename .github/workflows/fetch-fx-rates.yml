@@ -1,0 +1,26 @@
+name: Fetch FX rates
+
+on:
+  schedule:
+    # 05:00 UTC daily
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  fetch-fx-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install @supabase/supabase-js
+        run: npm install --no-save @supabase/supabase-js@^2
+
+      - name: Fetch and store today's rates
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/fetch-fx-rates.mjs
