@@ -71,6 +71,24 @@ export type Database = {
           },
         ]
       }
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -410,6 +428,8 @@ export type Database = {
           payment_provider: Database["public"]["Enums"]["payment_provider"]
           payment_ref: string | null
           printful_order_id: string | null
+          refunded_amount_cents: number | null
+          refunded_at: string | null
           shipping_address: Json
           shipping_cents: number
           status: Database["public"]["Enums"]["order_status"]
@@ -435,6 +455,8 @@ export type Database = {
           payment_provider: Database["public"]["Enums"]["payment_provider"]
           payment_ref?: string | null
           printful_order_id?: string | null
+          refunded_amount_cents?: number | null
+          refunded_at?: string | null
           shipping_address: Json
           shipping_cents: number
           status?: Database["public"]["Enums"]["order_status"]
@@ -460,6 +482,8 @@ export type Database = {
           payment_provider?: Database["public"]["Enums"]["payment_provider"]
           payment_ref?: string | null
           printful_order_id?: string | null
+          refunded_amount_cents?: number | null
+          refunded_at?: string | null
           shipping_address?: Json
           shipping_cents?: number
           status?: Database["public"]["Enums"]["order_status"]
@@ -891,6 +915,69 @@ export type Database = {
       }
     }
     Functions: {
+      admin_customer_summaries: {
+        Args: { p_cursor: string; p_limit?: number }
+        Returns: {
+          contact_email: string
+          customer_id: string
+          display_name: string
+          last_order_at: string
+          lifetime_totals: Json
+          order_count: number
+        }[]
+      }
+      admin_daily_revenue: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          currency: string
+          day: string
+          order_count: number
+          total_cents: number
+        }[]
+      }
+      admin_save_product: {
+        Args: {
+          p_base_cost_usd: number
+          p_category_ids: string[]
+          p_images: Json
+          p_is_bestseller: boolean
+          p_printful_variant_id: string
+          p_product_id: string
+          p_slug: string
+          p_status: Database["public"]["Enums"]["product_status"]
+          p_translations: Json
+          p_variants: Json
+        }
+        Returns: {
+          base_cost_usd: number
+          created_at: string
+          id: string
+          is_bestseller: boolean
+          printful_variant_id: string | null
+          slug: string
+          status: Database["public"]["Enums"]["product_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "products"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_top_products: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          name: string
+          product_key: string
+          quantity: number
+          revenue_cents: number
+        }[]
+      }
+      bootstrap_admin_if_empty: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       claim_webhook_event: {
         Args: {
           p_external_id: string
@@ -933,6 +1020,8 @@ export type Database = {
           payment_provider: Database["public"]["Enums"]["payment_provider"]
           payment_ref: string | null
           printful_order_id: string | null
+          refunded_amount_cents: number | null
+          refunded_at: string | null
           shipping_address: Json
           shipping_cents: number
           status: Database["public"]["Enums"]["order_status"]
@@ -950,6 +1039,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       validate_discount_code: {
         Args: { p_code: string }
         Returns: {

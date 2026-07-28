@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/*
+ * Admin design tokens — deliberately decoupled from the storefront's
+ * globals.css. Strict black-and-white, borders only, no flat color fills
+ * anywhere (not even the storefront's warm neutral-0/900 or terracotta
+ * accent). See src/components/admin/ui/ for the primitives built on this.
+ */
+:root {
+  --font-display: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+  --font-body: var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 180ms;
+
+  --admin-container-max: 100rem;
+  --admin-container-pad: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --admin-container-pad: 2rem;
+  }
+}
+
+@theme inline {
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --ease-standard: var(--ease-standard);
+  --duration-fast: var(--duration-fast);
+  --duration-base: var(--duration-base);
+}
+
+@layer base {
+  * {
+    border-color: black;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* Kept accent-colored deliberately: an accessibility mechanism, not a
+     decorative flat color fill — do not "fix" this to black/white. */
+  :focus-visible {
+    outline-width: 2px;
+    outline-style: solid;
+    outline-color: #943f22;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

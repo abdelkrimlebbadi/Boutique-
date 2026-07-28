@@ -25,7 +25,7 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 
 - **TypeScript strict** : `strict: true` dans `tsconfig.json`, pas de `any` implicite.
 - **Server Components par défaut.** N'utiliser `"use client"` que lorsque c'est strictement nécessaire (interactivité, hooks, state, browser APIs).
-- **Server Actions pour toutes les mutations** (écritures). Pas de routes API custom pour des opérations CRUD internes, sauf besoin spécifique (webhooks externes : Printful, PayPal, YouCan Pay).
+- **Server Actions pour toutes les mutations** (écritures). Pas de routes API custom pour des opérations CRUD internes, sauf besoin spécifique : webhooks externes (Printful, PayPal, YouCan Pay) et exports de fichiers nécessitant un contrôle direct des en-têtes HTTP (`Content-Disposition` — export CSV admin), aucune Server Action ne pouvant produire une réponse HTTP brute téléchargeable.
 - **Zod pour toute validation d'entrée** : données de formulaires, payloads de Server Actions, webhooks entrants.
 - Pas de commentaires inutiles ; code auto-documenté par des noms explicites.
 
@@ -52,24 +52,34 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 ├── wrangler.toml            # Config déploiement Cloudflare Workers
 ├── open-next.config.ts      # Config adaptateur @opennextjs/cloudflare
 ├── next.config.ts
+├── supabase/
+│   ├── config.toml           # Enregistrement du Custom Access Token Auth Hook (rôle admin)
+│   └── migrations/
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/        # Pages, layouts (App Router, next-intl)
+│   │   ├── [locale]/        # Pages, layouts (App Router, next-intl) — boutique
 │   │   │   └── checkout/    # Tunnel : cart → address → shipping → payment → mock-pay → confirmation
+│   │   ├── admin/            # Back-office — HORS next-intl, français uniquement, layout racine séparé
+│   │   │   ├── (public)/      # /admin/login, /admin/setup — pas de vérification admin
+│   │   │   ├── (protected)/    # Dashboard, commandes, produits, codes promo, clients — requireAdmin()
+│   │   │   └── orders/export/route.ts   # Export CSV (voir plus bas)
 │   │   └── api/
-│   │       └── webhooks/[provider]/route.ts   # Seule route API du projet (paiement + Printful)
-│   ├── components/          # Composants UI partagés
-│   │   └── checkout/        # CheckoutSteps, CheckoutAddressForm, DiscountCodeForm, OrderSummary, ...
+│   │       └── webhooks/[provider]/route.ts   # Paiement + Printful
+│   ├── components/          # Composants UI partagés (boutique)
+│   │   ├── checkout/        # CheckoutSteps, CheckoutAddressForm, DiscountCodeForm, OrderSummary, ...
+│   │   └── admin/            # Système de design admin séparé (noir/blanc, contours uniquement)
 │   ├── actions/              # Server Actions (mutations)
-│   │   └── checkout.ts       # saveCheckoutAddress, applyDiscountCode, startPayment, ...
+│   │   ├── checkout.ts       # saveCheckoutAddress, applyDiscountCode, startPayment, ...
+│   │   └── admin/             # auth, orders (remboursement), products, discounts
 │   ├── lib/
 │   │   ├── supabase/         # Clients Supabase (anon + service_role)
 │   │   ├── payments/          # Couche d'abstraction PaymentProvider (types, sélection, Mock)
-│   │   ├── printful/          # Intégration fulfillment (création commande + webhook expédition)
+│   │   ├── printful/          # Fulfillment (commandes, webhook expédition, catalogue, statut)
 │   │   ├── paypal/            # Intégration paiement PayPal (Orders API v2)
 │   │   ├── youcan-pay/        # Intégration paiement YouCan Pay (confiance faible, voir commentaires)
 │   │   ├── resend/            # Emails transactionnels (client, envois, templates React Email)
 │   │   ├── checkout/          # Tunnel : pricing serveur, cookies d'état, orchestration webhooks
+│   │   ├── admin/             # Auth admin, métriques dashboard, requêtes commandes/produits/clients, CSV
 │   │   └── validation/        # Schémas zod partagés
 │   └── types/                # Types partagés
 ├── public/
@@ -82,3 +92,13 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 - Le total d'une commande est recalculé intégralement côté serveur (`src/lib/checkout/compute-order-pricing.ts`) avant toute création de commande ou paiement — jamais de confiance dans un montant venu du client.
 - `orders` est créée `pending` avant redirection vers le provider, via la fonction Postgres atomique `create_order_with_items` (service_role uniquement, `EXECUTE` révoqué pour `anon`/`authenticated`).
 - Webhooks (`/api/webhooks/[provider]`, paiement + Printful) : idempotents via `claim_webhook_event` (RPC service_role, révoquée pour `anon`/`authenticated`), clé `(provider, external_id)`.
+
+## Administration (`/admin`)
+
+- Hors `next-intl` : route racine séparée (`src/app/admin/layout.tsx`, son propre `<html>`/`<body>`), français uniquement, chaînes en dur.
+- Rôle admin porté par un claim JWT Supabase (`user_role: 'admin'`), injecté par le Custom Access Token Auth Hook `custom_access_token_hook` (`supabase/migrations/20260728130000_...sql` + `supabase/config.toml`) à partir de la table `admin_users` (source de vérité, aucune policy RLS anon/authenticated). **Après un déploiement, vérifier que le hook est bien actif dans Supabase Dashboard → Authentication → Hooks** — `config.toml` seul ne suffit que si le déploiement passe par la CLI Supabase liée.
+- `src/middleware.ts` court-circuite tout `/admin/**` avant le routing `next-intl` et avant la session anonyme boutique ; `src/lib/admin/auth.ts::requireAdmin()` revérifie côté serveur dans chaque page/Server Action (défense en profondeur).
+- Toutes les lectures/écritures admin passent par `createServiceRoleClient()` — aucune policy RLS existante n'anticipe un rôle staff.
+- Système de design admin (`src/components/admin/ui/`) volontairement découplé de la boutique : noir et blanc strict, bordures 1px, **aucun aplat de couleur**, coins carrés. Ne jamais réutiliser les primitives `src/components/ui/*` de la boutique (colorées, arrondies) dans `/admin`.
+- Premier compte admin créé via `/admin/setup` (page qui se désactive elle-même une fois un admin créé), protégé par `ADMIN_BOOTSTRAP_SECRET` et la RPC `bootstrap_admin_if_empty` (verrou advisory contre une double création concurrente).
+- Export CSV des commandes : `src/app/admin/orders/export/route.ts`, un Route Handler (pas une Server Action — contrôle direct de `Content-Disposition` requis), couvert par le même filtre d'auth middleware que le reste de `/admin`.
