@@ -8,11 +8,69 @@
   "currencySwitcher": {
     "label": "Devise"
   },
+  "nav": {
+    "products": "Produits",
+    "search": "Rechercher"
+  },
+  "breadcrumb": {
+    "home": "Accueil"
+  },
   "home": {
     "title": "Bienvenue sur Boutique",
     "subtitle": "Impression à la demande, expédiée depuis le Maroc vers l'Europe et l'Amérique du Nord.",
+    "heroCta": "Voir les produits",
     "priceDemoTitle": "Exemple de prix converti",
     "priceDemoDescription": "Prix de base converti dans votre devise, puis arrondi psychologiquement.",
-    "ratesUnavailable": "Taux de change indisponibles pour le moment."
+    "ratesUnavailable": "Taux de change indisponibles pour le moment.",
+    "categoriesTitle": "Catégories",
+    "bestsellersTitle": "Meilleures ventes",
+    "testimonialsTitle": "Ce que disent nos clients"
+  },
+  "cart": {
+    "cartLabel": "Panier",
+    "title": "Panier ({count})",
+    "empty": "Votre panier est vide.",
+    "subtotal": "Sous-total",
+    "quantity": "Quantité",
+    "remove": "Retirer",
+    "close": "Fermer le panier"
+  },
+  "product": {
+    "addToCart": "Ajouter au panier",
+    "adding": "Ajout...",
+    "selectSize": "Taille",
+    "selectColor": "Couleur",
+    "sizeGuide": "Guide des tailles",
+    "sizeGuideTitle": "Guide des tailles",
+    "shippingEstimateTitle": "Livraison estimée",
+    "selectCountry": "Pays de livraison",
+    "shippingEstimateResult": "Livraison vers {country} : {price}",
+    "shippingEstimateUnavailable": "Estimation indisponible pour ce pays.",
+    "outOfStock": "Indisponible",
+    "from": "à partir de"
+  },
+  "catalog": {
+    "filtersTitle": "Filtres",
+    "categoryLabel": "Catégorie",
+    "allCategories": "Toutes les catégories",
+    "colorLabel": "Couleur",
+    "sizeLabel": "Taille",
+    "priceLabel": "Prix",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "applyFilters": "Appliquer",
+    "sortLabel": "Trier par",
+    "sortNewest": "Nouveautés",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "loadMore": "Charger plus",
+    "noResults": "Aucun produit ne correspond à ces filtres."
+  },
+  "search": {
+    "placeholder": "Rechercher un produit...",
+    "title": "Recherche",
+    "resultsCount": "{count} résultat(s) pour « {query} »",
+    "noResults": "Aucun résultat pour « {query} ».",
+    "prompt": "Commencez à taper pour rechercher."
   }
 }

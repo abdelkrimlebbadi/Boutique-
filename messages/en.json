@@ -8,11 +8,69 @@
   "currencySwitcher": {
     "label": "Currency"
   },
+  "nav": {
+    "products": "Products",
+    "search": "Search"
+  },
+  "breadcrumb": {
+    "home": "Home"
+  },
   "home": {
     "title": "Welcome to Boutique",
     "subtitle": "Print-on-demand, shipped from Morocco to Europe and North America.",
+    "heroCta": "Shop products",
     "priceDemoTitle": "Converted price example",
     "priceDemoDescription": "Base price converted to your currency, then rounded to a charm price.",
-    "ratesUnavailable": "Exchange rates are not available right now."
+    "ratesUnavailable": "Exchange rates are not available right now.",
+    "categoriesTitle": "Categories",
+    "bestsellersTitle": "Bestsellers",
+    "testimonialsTitle": "What our customers say"
+  },
+  "cart": {
+    "cartLabel": "Cart",
+    "title": "Cart ({count})",
+    "empty": "Your cart is empty.",
+    "subtotal": "Subtotal",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "close": "Close cart"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "adding": "Adding...",
+    "selectSize": "Size",
+    "selectColor": "Color",
+    "sizeGuide": "Size guide",
+    "sizeGuideTitle": "Size guide",
+    "shippingEstimateTitle": "Estimated shipping",
+    "selectCountry": "Shipping country",
+    "shippingEstimateResult": "Shipping to {country}: {price}",
+    "shippingEstimateUnavailable": "Estimate unavailable for this country.",
+    "outOfStock": "Out of stock",
+    "from": "from"
+  },
+  "catalog": {
+    "filtersTitle": "Filters",
+    "categoryLabel": "Category",
+    "allCategories": "All categories",
+    "colorLabel": "Color",
+    "sizeLabel": "Size",
+    "priceLabel": "Price",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "applyFilters": "Apply",
+    "sortLabel": "Sort by",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: low to high",
+    "sortPriceDesc": "Price: high to low",
+    "loadMore": "Load more",
+    "noResults": "No products match these filters."
+  },
+  "search": {
+    "placeholder": "Search for a product...",
+    "title": "Search",
+    "resultsCount": "{count} result(s) for \"{query}\"",
+    "noResults": "No results for \"{query}\".",
+    "prompt": "Start typing to search."
   }
 }

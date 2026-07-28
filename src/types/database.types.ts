@@ -367,6 +367,12 @@ export type Database = {
           {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
+            referencedRelation: "product_catalog"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -520,6 +526,12 @@ export type Database = {
           {
             foreignKeyName: "product_categories_product_id_fkey"
             columns: ["product_id"]
+            referencedRelation: "product_catalog"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_categories_product_id_fkey"
+            columns: ["product_id"]
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -551,6 +563,12 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            referencedRelation: "product_catalog"
+            referencedColumns: ["product_id"]
+          },
           {
             foreignKeyName: "product_images_product_id_fkey"
             columns: ["product_id"]
@@ -591,6 +609,12 @@ export type Database = {
           {
             foreignKeyName: "product_translations_product_id_fkey"
             columns: ["product_id"]
+            referencedRelation: "product_catalog"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_translations_product_id_fkey"
+            columns: ["product_id"]
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -607,6 +631,7 @@ export type Database = {
           sku: string
           stock_policy: Database["public"]["Enums"]["stock_policy"]
           updated_at: string
+          weight_grams: number | null
         }
         Insert: {
           color?: string | null
@@ -618,6 +643,7 @@ export type Database = {
           sku: string
           stock_policy?: Database["public"]["Enums"]["stock_policy"]
           updated_at?: string
+          weight_grams?: number | null
         }
         Update: {
           color?: string | null
@@ -629,8 +655,15 @@ export type Database = {
           sku?: string
           stock_policy?: Database["public"]["Enums"]["stock_policy"]
           updated_at?: string
+          weight_grams?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            referencedRelation: "product_catalog"
+            referencedColumns: ["product_id"]
+          },
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
@@ -644,6 +677,7 @@ export type Database = {
           base_cost_usd: number
           created_at: string
           id: string
+          is_bestseller: boolean
           printful_variant_id: string | null
           slug: string
           status: Database["public"]["Enums"]["product_status"]
@@ -653,6 +687,7 @@ export type Database = {
           base_cost_usd: number
           created_at?: string
           id?: string
+          is_bestseller?: boolean
           printful_variant_id?: string | null
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
@@ -662,6 +697,7 @@ export type Database = {
           base_cost_usd?: number
           created_at?: string
           id?: string
+          is_bestseller?: boolean
           printful_variant_id?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
@@ -733,6 +769,36 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          author_name: string
+          created_at: string
+          id: string
+          locale: string
+          position: number
+          quote: string
+          rating: number
+        }
+        Insert: {
+          author_name: string
+          created_at?: string
+          id?: string
+          locale: string
+          position?: number
+          quote: string
+          rating: number
+        }
+        Update: {
+          author_name?: string
+          created_at?: string
+          id?: string
+          locale?: string
+          position?: number
+          quote?: string
+          rating?: number
+        }
+        Relationships: []
+      }
       webhook_events: {
         Row: {
           created_at: string
@@ -768,6 +834,26 @@ export type Database = {
           fetched_at: string | null
           quote_currency: string | null
           rate: number | null
+        }
+        Relationships: []
+      }
+      product_catalog: {
+        Row: {
+          category_slugs: string[] | null
+          colors: string[] | null
+          created_at: string | null
+          description: string | null
+          image_alt: string | null
+          image_url: string | null
+          is_bestseller: boolean | null
+          locale: string | null
+          min_price_usd_cents: number | null
+          name: string | null
+          product_id: string | null
+          seo_desc: string | null
+          seo_title: string | null
+          sizes: string[] | null
+          slug: string | null
         }
         Relationships: []
       }

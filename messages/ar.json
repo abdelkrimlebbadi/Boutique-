@@ -8,11 +8,69 @@
   "currencySwitcher": {
     "label": "العملة"
   },
+  "nav": {
+    "products": "المنتجات",
+    "search": "بحث"
+  },
+  "breadcrumb": {
+    "home": "الرئيسية"
+  },
   "home": {
     "title": "مرحبًا بكم في بوتيك",
     "subtitle": "طباعة عند الطلب، تُشحن من المغرب إلى أوروبا وأمريكا الشمالية.",
+    "heroCta": "تسوق المنتجات",
     "priceDemoTitle": "مثال على سعر محوّل",
     "priceDemoDescription": "السعر الأساسي محوّل إلى عملتك، ثم مقرّب نفسيًا لينتهي بـ 0.99.",
-    "ratesUnavailable": "أسعار الصرف غير متوفرة حاليًا."
+    "ratesUnavailable": "أسعار الصرف غير متوفرة حاليًا.",
+    "categoriesTitle": "الفئات",
+    "bestsellersTitle": "الأكثر مبيعًا",
+    "testimonialsTitle": "ماذا يقول عملاؤنا"
+  },
+  "cart": {
+    "cartLabel": "السلة",
+    "title": "السلة ({count})",
+    "empty": "سلتك فارغة.",
+    "subtotal": "المجموع الفرعي",
+    "quantity": "الكمية",
+    "remove": "إزالة",
+    "close": "إغلاق السلة"
+  },
+  "product": {
+    "addToCart": "أضف إلى السلة",
+    "adding": "جارٍ الإضافة...",
+    "selectSize": "المقاس",
+    "selectColor": "اللون",
+    "sizeGuide": "دليل المقاسات",
+    "sizeGuideTitle": "دليل المقاسات",
+    "shippingEstimateTitle": "تقدير الشحن",
+    "selectCountry": "بلد الشحن",
+    "shippingEstimateResult": "الشحن إلى {country}: {price}",
+    "shippingEstimateUnavailable": "التقدير غير متوفر لهذا البلد.",
+    "outOfStock": "غير متوفر",
+    "from": "ابتداءً من"
+  },
+  "catalog": {
+    "filtersTitle": "التصفية",
+    "categoryLabel": "الفئة",
+    "allCategories": "كل الفئات",
+    "colorLabel": "اللون",
+    "sizeLabel": "المقاس",
+    "priceLabel": "السعر",
+    "minPrice": "الأدنى",
+    "maxPrice": "الأقصى",
+    "applyFilters": "تطبيق",
+    "sortLabel": "ترتيب حسب",
+    "sortNewest": "الأحدث",
+    "sortPriceAsc": "السعر: من الأقل إلى الأعلى",
+    "sortPriceDesc": "السعر: من الأعلى إلى الأقل",
+    "loadMore": "تحميل المزيد",
+    "noResults": "لا توجد منتجات مطابقة لهذه التصفية."
+  },
+  "search": {
+    "placeholder": "ابحث عن منتج...",
+    "title": "بحث",
+    "resultsCount": "{count} نتيجة لـ «{query}»",
+    "noResults": "لا توجد نتائج لـ «{query}».",
+    "prompt": "ابدأ الكتابة للبحث."
   }
 }
