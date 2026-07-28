@@ -41,7 +41,7 @@ export default async function HomePage({
 
   return (
     <div>
-      <Hero />
+      <Hero featuredProduct={bestsellers[0] ?? null} />
       <CategoryGrid categories={categories} />
       <BestsellersSection products={bestsellers} />
       <Testimonials testimonials={testimonials} />

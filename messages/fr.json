@@ -1,6 +1,10 @@
 {
   "common": {
-    "brand": "Boutique"
+    "brand": "Boutique",
+    "skipToContent": "Aller au contenu principal",
+    "notFoundTitle": "Page introuvable",
+    "notFoundMessage": "La page que vous cherchez n'existe pas ou plus.",
+    "backToHome": "Retour à l'accueil"
   },
   "localeSwitcher": {
     "label": "Langue"
@@ -19,12 +23,10 @@
     "title": "Bienvenue sur Boutique",
     "subtitle": "Impression à la demande, expédiée depuis le Maroc vers l'Europe et l'Amérique du Nord.",
     "heroCta": "Voir les produits",
-    "priceDemoTitle": "Exemple de prix converti",
-    "priceDemoDescription": "Prix de base converti dans votre devise, puis arrondi psychologiquement.",
-    "ratesUnavailable": "Taux de change indisponibles pour le moment.",
     "categoriesTitle": "Catégories",
     "bestsellersTitle": "Meilleures ventes",
-    "testimonialsTitle": "Ce que disent nos clients"
+    "testimonialsTitle": "Ce que disent nos clients",
+    "ratingLabel": "Note : {rating} sur 5"
   },
   "cart": {
     "cartLabel": "Panier",
@@ -47,6 +49,7 @@
     "shippingEstimateResult": "Livraison vers {country} : {price}",
     "shippingEstimateUnavailable": "Estimation indisponible pour ce pays.",
     "outOfStock": "Indisponible",
+    "bestseller": "Best-seller",
     "from": "à partir de"
   },
   "catalog": {

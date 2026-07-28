@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { getShippingEstimateAction } from "@/actions/shipping";
 import { formatMoney } from "@/lib/currency/format-money";
+import { Select } from "@/components/ui/Select";
 import type { ShippingEstimate as ShippingEstimateResult } from "@/lib/catalog/get-shipping-estimate";
 
 const COUNTRIES = [
@@ -39,25 +40,23 @@ export function ShippingEstimate({ weightGrams }: { weightGrams: number | null }
   const countryLabel = COUNTRIES.find((c) => c.code === countryCode)?.label ?? countryCode;
 
   return (
-    <div className="rounded-lg border border-black/10 p-4 text-sm dark:border-white/20">
-      <p className="mb-2 font-medium">{t("shippingEstimateTitle")}</p>
-      <label className="flex items-center gap-2">
-        <span>{t("selectCountry")}</span>
-        <select
-          value={countryCode}
-          onChange={(event) => onCountryChange(event.target.value)}
-          className="rounded-md border border-black/10 bg-transparent py-1 ps-2 pe-6 dark:border-white/20"
-        >
+    <div className="border border-neutral-200 p-4 text-sm">
+      <p className="mb-3 font-medium text-neutral-900">
+        {t("shippingEstimateTitle")}
+      </p>
+      <label className="flex items-center gap-3">
+        <span className="text-neutral-600">{t("selectCountry")}</span>
+        <Select value={countryCode} onChange={(event) => onCountryChange(event.target.value)}>
           {COUNTRIES.map((country) => (
             <option key={country.code} value={country.code}>
               {country.label}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
-      {isPending && <p className="mt-2 text-black/50 dark:text-white/50">…</p>}
+      {isPending && <p className="mt-2 text-neutral-500">…</p>}
       {!isPending && checked && (
-        <p className="mt-2">
+        <p className="mt-2 text-neutral-700">
           {estimate
             ? t("shippingEstimateResult", {
                 country: countryLabel,

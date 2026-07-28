@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { setPreferredCurrency } from "@/actions/currency";
 import { CURRENCIES, type Currency } from "@/lib/currency/constants";
+import { Select } from "@/components/ui/Select";
 
 export function CurrencySwitcher({
   initialCurrency,
@@ -25,21 +26,21 @@ export function CurrencySwitcher({
   }
 
   return (
-    <label className="inline-flex items-center gap-2 text-sm">
+    <label className="inline-flex items-center">
       <span className="sr-only">{t("label")}</span>
-      <select
+      <Select
         aria-label={t("label")}
         value={currency}
         disabled={isPending}
         onChange={(event) => onChange(event.target.value as Currency)}
-        className="rounded-md border border-black/10 bg-transparent py-1 ps-2 pe-6 dark:border-white/20"
+        compact
       >
         {CURRENCIES.map((value) => (
           <option key={value} value={value}>
             {value}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

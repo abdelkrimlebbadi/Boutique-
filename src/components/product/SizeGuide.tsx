@@ -13,22 +13,24 @@ export function SizeGuide() {
   const t = useTranslations("product");
 
   return (
-    <details className="rounded-lg border border-black/10 p-4 text-sm dark:border-white/20">
-      <summary className="cursor-pointer font-medium">{t("sizeGuide")}</summary>
-      <table className="mt-3 w-full text-start">
+    <details className="border border-neutral-200 p-4 text-sm">
+      <summary className="cursor-pointer font-medium text-neutral-900">
+        {t("sizeGuide")}
+      </summary>
+      <table className="mt-4 w-full text-start">
         <thead>
-          <tr className="text-black/60 dark:text-white/60">
-            <th className="text-start font-normal">{t("selectSize")}</th>
-            <th className="text-start font-normal">Chest (cm)</th>
-            <th className="text-start font-normal">Length (cm)</th>
+          <tr className="border-b border-neutral-200 text-neutral-500">
+            <th className="pb-2 text-start font-normal">{t("selectSize")}</th>
+            <th className="pb-2 text-start font-normal">Chest (cm)</th>
+            <th className="pb-2 text-start font-normal">Length (cm)</th>
           </tr>
         </thead>
         <tbody>
           {SIZE_CHART.map((row) => (
-            <tr key={row.size}>
-              <td className="py-1">{row.size}</td>
-              <td className="py-1">{row.chestCm}</td>
-              <td className="py-1">{row.lengthCm}</td>
+            <tr key={row.size} className="border-b border-neutral-100 last:border-0">
+              <td className="py-2 text-neutral-900">{row.size}</td>
+              <td className="py-2 text-neutral-700">{row.chestCm}</td>
+              <td className="py-2 text-neutral-700">{row.lengthCm}</td>
             </tr>
           ))}
         </tbody>

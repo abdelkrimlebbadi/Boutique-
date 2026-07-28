@@ -7,6 +7,7 @@ import { SortSelect } from "@/components/catalog/SortSelect";
 import { ProductCard } from "@/components/product/ProductCard";
 import { LoadMoreLink } from "@/components/catalog/LoadMoreLink";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { Container } from "@/components/ui/Container";
 import { breadcrumbSchema } from "@/lib/seo/schema";
 import { buildMetadata } from "@/lib/seo/metadata";
 import type { Locale } from "@/i18n/routing";
@@ -68,7 +69,7 @@ export default async function ProductsPage({
     ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <Container className="py-8 lg:py-12">
       <JsonLd
         data={breadcrumbSchema(
           [
@@ -79,20 +80,23 @@ export default async function ProductsPage({
         )}
       />
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-[200px_1fr]">
+      <h1 className="mb-8 font-display text-2xl font-semibold lg:mb-10 lg:text-3xl">
+        {navT("products")}
+      </h1>
+
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-[12rem_1fr] lg:gap-16">
         <FiltersSidebar categories={categories} />
 
         <div>
-          <div className="mb-4 flex items-center justify-end">
+          <div className="mb-6 flex items-center justify-between border-b border-neutral-200 pb-4">
+            <p className="text-sm text-neutral-600">{items.length}</p>
             <SortSelect />
           </div>
 
           {items.length === 0 ? (
-            <p className="text-sm text-black/60 dark:text-white/60">
-              {catalogT("noResults")}
-            </p>
+            <p className="text-sm text-neutral-600">{catalogT("noResults")}</p>
           ) : (
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6">
               {items.map((product, index) => (
                 <ProductCard
                   key={product.id}
@@ -104,7 +108,7 @@ export default async function ProductsPage({
           )}
 
           {nextCursor && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-10 flex justify-center">
               <LoadMoreLink
                 basePath="/products"
                 searchParams={sp}
@@ -114,6 +118,6 @@ export default async function ProductsPage({
           )}
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

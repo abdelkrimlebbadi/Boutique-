@@ -1,6 +1,10 @@
 {
   "common": {
-    "brand": "بوتيك"
+    "brand": "بوتيك",
+    "skipToContent": "الانتقال إلى المحتوى الرئيسي",
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundMessage": "الصفحة التي تبحث عنها لم تعد موجودة.",
+    "backToHome": "العودة إلى الرئيسية"
   },
   "localeSwitcher": {
     "label": "اللغة"
@@ -19,12 +23,10 @@
     "title": "مرحبًا بكم في بوتيك",
     "subtitle": "طباعة عند الطلب، تُشحن من المغرب إلى أوروبا وأمريكا الشمالية.",
     "heroCta": "تسوق المنتجات",
-    "priceDemoTitle": "مثال على سعر محوّل",
-    "priceDemoDescription": "السعر الأساسي محوّل إلى عملتك، ثم مقرّب نفسيًا لينتهي بـ 0.99.",
-    "ratesUnavailable": "أسعار الصرف غير متوفرة حاليًا.",
     "categoriesTitle": "الفئات",
     "bestsellersTitle": "الأكثر مبيعًا",
-    "testimonialsTitle": "ماذا يقول عملاؤنا"
+    "testimonialsTitle": "ماذا يقول عملاؤنا",
+    "ratingLabel": "التقييم: {rating} من 5"
   },
   "cart": {
     "cartLabel": "السلة",
@@ -47,6 +49,7 @@
     "shippingEstimateResult": "الشحن إلى {country}: {price}",
     "shippingEstimateUnavailable": "التقدير غير متوفر لهذا البلد.",
     "outOfStock": "غير متوفر",
+    "bestseller": "الأكثر مبيعًا",
     "from": "ابتداءً من"
   },
   "catalog": {

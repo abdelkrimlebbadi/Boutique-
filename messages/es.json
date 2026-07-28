@@ -1,6 +1,10 @@
 {
   "common": {
-    "brand": "Boutique"
+    "brand": "Boutique",
+    "skipToContent": "Ir al contenido principal",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundMessage": "La página que buscas ya no existe.",
+    "backToHome": "Volver al inicio"
   },
   "localeSwitcher": {
     "label": "Idioma"
@@ -19,12 +23,10 @@
     "title": "Bienvenido a Boutique",
     "subtitle": "Impresión bajo demanda, enviada desde Marruecos a Europa y Norteamérica.",
     "heroCta": "Ver productos",
-    "priceDemoTitle": "Ejemplo de precio convertido",
-    "priceDemoDescription": "Precio base convertido a tu moneda y redondeado psicológicamente.",
-    "ratesUnavailable": "Los tipos de cambio no están disponibles en este momento.",
     "categoriesTitle": "Categorías",
     "bestsellersTitle": "Más vendidos",
-    "testimonialsTitle": "Lo que dicen nuestros clientes"
+    "testimonialsTitle": "Lo que dicen nuestros clientes",
+    "ratingLabel": "Valoración: {rating} de 5"
   },
   "cart": {
     "cartLabel": "Carrito",
@@ -47,6 +49,7 @@
     "shippingEstimateResult": "Envío a {country}: {price}",
     "shippingEstimateUnavailable": "Estimación no disponible para este país.",
     "outOfStock": "Agotado",
+    "bestseller": "Más vendido",
     "from": "desde"
   },
   "catalog": {

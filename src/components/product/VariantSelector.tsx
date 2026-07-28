@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useCart } from "@/components/cart/CartProvider";
 import { formatMoney } from "@/lib/currency/format-money";
+import { Tag } from "@/components/ui/Tag";
+import { Button } from "@/components/ui/Button";
 import type { ProductVariantView } from "@/lib/catalog/get-product-by-slug";
 
 export function VariantSelector({
@@ -78,33 +80,27 @@ export function VariantSelector({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {selectedVariant && (
-        <p className="text-2xl font-semibold">
+        <p className="font-display text-2xl font-semibold">
           {formatMoney(selectedVariant.priceCents, selectedVariant.currency, locale)}
         </p>
       )}
 
       {colors.length > 0 && (
         <div>
-          <span className="mb-2 block text-sm font-medium">
+          <span className="mb-3 block text-xs font-semibold tracking-wide text-neutral-500 uppercase">
             {t("selectColor")}
           </span>
           <div className="flex flex-wrap gap-2">
             {colors.map((color) => (
-              <button
+              <Tag
                 key={color}
-                type="button"
+                pressed={selectedColor === color}
                 onClick={() => selectColor(color)}
-                aria-pressed={selectedColor === color}
-                className={`rounded-full border px-3 py-1 text-sm ${
-                  selectedColor === color
-                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                    : "border-black/20 dark:border-white/20"
-                }`}
               >
                 {color}
-              </button>
+              </Tag>
             ))}
           </div>
         </div>
@@ -112,41 +108,30 @@ export function VariantSelector({
 
       {sizes.length > 0 && (
         <div>
-          <span className="mb-2 block text-sm font-medium">
+          <span className="mb-3 block text-xs font-semibold tracking-wide text-neutral-500 uppercase">
             {t("selectSize")}
           </span>
           <div className="flex flex-wrap gap-2">
             {sizes.map((size) => (
-              <button
+              <Tag
                 key={size}
-                type="button"
+                pressed={selectedSize === size}
                 onClick={() => selectSize(size)}
-                aria-pressed={selectedSize === size}
-                className={`rounded-md border px-3 py-1 text-sm ${
-                  selectedSize === size
-                    ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                    : "border-black/20 dark:border-white/20"
-                }`}
               >
                 {size}
-              </button>
+              </Tag>
             ))}
           </div>
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={onAddToCart}
-        disabled={!selectedVariant || isPending}
-        className="rounded-md bg-black px-6 py-3 font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
-      >
+      <Button onClick={onAddToCart} disabled={!selectedVariant || isPending}>
         {isPending
           ? t("adding")
           : selectedVariant
             ? t("addToCart")
             : t("outOfStock")}
-      </button>
+      </Button>
     </div>
   );
 }

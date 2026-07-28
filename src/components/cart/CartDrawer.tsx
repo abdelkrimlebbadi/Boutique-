@@ -3,10 +3,11 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import { useTransition } from "react";
 import { useCart } from "./CartProvider";
 import { updateCartItemQuantity, removeCartItem } from "@/actions/cart";
 import { formatMoney } from "@/lib/currency/format-money";
-import { useTransition } from "react";
+import { Input } from "@/components/ui/Input";
 
 export function CartDrawer() {
   const t = useTranslations("cart");
@@ -29,50 +30,53 @@ export function CartDrawer() {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(next) => (next ? open() : close())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-neutral-900/50 data-[state=open]:animate-none" />
         <Dialog.Content
-          className="fixed inset-y-0 end-0 z-50 flex w-full max-w-sm translate-x-full rtl:-translate-x-full flex-col bg-white shadow-xl transition-transform duration-200 data-[state=open]:translate-x-0 dark:bg-black"
+          className="fixed inset-y-0 end-0 z-50 flex w-full max-w-md translate-x-full flex-col border-s border-neutral-200 bg-neutral-0 transition-transform duration-(--duration-base) ease-(--ease-standard) rtl:-translate-x-full rtl:translate-x-0 data-[state=open]:translate-x-0"
           aria-describedby={undefined}
         >
-          <div className="flex items-center justify-between border-b border-black/10 p-4 dark:border-white/20">
-            <Dialog.Title className="font-semibold">
+          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+            <Dialog.Title className="font-display text-lg font-semibold">
               {t("title", { count: cart.itemCount })}
             </Dialog.Title>
-            <Dialog.Close aria-label={t("close")} className="p-1">
+            <Dialog.Close
+              aria-label={t("close")}
+              className="flex h-9 w-9 items-center justify-center text-neutral-700 transition-colors duration-(--duration-base) hover:text-accent-600"
+            >
               ✕
             </Dialog.Close>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto px-5 py-4">
             {cart.items.length === 0 ? (
-              <p className="text-sm text-black/60 dark:text-white/60">
-                {t("empty")}
-              </p>
+              <p className="text-sm text-neutral-600">{t("empty")}</p>
             ) : (
-              <ul className="flex flex-col gap-4">
+              <ul className="flex flex-col gap-5">
                 {cart.items.map((item) => (
-                  <li key={item.id} className="flex gap-3">
+                  <li key={item.id} className="flex gap-4">
                     {item.imageUrl && (
-                      <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-md bg-black/5">
+                      <div className="relative aspect-4/5 h-24 w-19 shrink-0 bg-neutral-100">
                         <Image
                           src={item.imageUrl}
                           alt={item.imageAlt ?? item.productName}
                           fill
-                          sizes="64px"
+                          sizes="76px"
                           className="object-cover"
                         />
                       </div>
                     )}
                     <div className="flex flex-1 flex-col gap-1 text-sm">
-                      <span className="font-medium">{item.productName}</span>
-                      <span className="text-black/60 dark:text-white/60">
+                      <span className="font-medium text-neutral-900">
+                        {item.productName}
+                      </span>
+                      <span className="text-neutral-600">
                         {[item.color, item.size].filter(Boolean).join(" / ")}
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div className="mt-1 flex items-center gap-3">
                         <label className="sr-only" htmlFor={`qty-${item.id}`}>
                           {t("quantity")}
                         </label>
-                        <input
+                        <Input
                           id={`qty-${item.id}`}
                           type="number"
                           min={1}
@@ -82,19 +86,19 @@ export function CartDrawer() {
                           onChange={(event) =>
                             onQuantityChange(item.id, Number(event.target.value))
                           }
-                          className="w-14 rounded-md border border-black/10 px-2 py-1 dark:border-white/20"
+                          className="h-9 w-16"
                         />
                         <button
                           type="button"
                           disabled={isPending}
                           onClick={() => onRemove(item.id)}
-                          className="text-black/50 underline hover:text-black dark:text-white/50 dark:hover:text-white"
+                          className="text-neutral-600 underline underline-offset-2 transition-colors duration-(--duration-base) hover:text-accent-600 disabled:opacity-40"
                         >
                           {t("remove")}
                         </button>
                       </div>
                     </div>
-                    <span className="whitespace-nowrap font-medium">
+                    <span className="whitespace-nowrap font-medium text-neutral-900">
                       {formatMoney(item.lineTotalCents, cart.currency, locale)}
                     </span>
                   </li>
@@ -104,8 +108,8 @@ export function CartDrawer() {
           </div>
 
           {cart.items.length > 0 && (
-            <div className="border-t border-black/10 p-4 dark:border-white/20">
-              <div className="flex justify-between font-semibold">
+            <div className="border-t border-neutral-200 px-5 py-4">
+              <div className="flex justify-between font-display text-lg font-semibold">
                 <span>{t("subtotal")}</span>
                 <span>{formatMoney(cart.subtotalCents, cart.currency, locale)}</span>
               </div>

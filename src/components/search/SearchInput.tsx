@@ -44,7 +44,7 @@ export function SearchInput() {
         onChange={(event) => onChange(event.target.value)}
         placeholder={t("placeholder")}
         autoFocus
-        className="w-full rounded-md border border-black/10 px-4 py-3 text-base dark:border-white/20"
+        className="w-full border-b-2 border-neutral-300 bg-transparent py-3 font-display text-xl text-neutral-900 placeholder:text-neutral-400 focus-visible:border-accent-600"
       />
     </label>
   );

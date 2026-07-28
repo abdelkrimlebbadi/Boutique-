@@ -19,19 +19,36 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body>
+      <body style={{ background: "#fbfaf7", color: "#1f1b14", margin: 0 }}>
         <div
           style={{
             maxWidth: "32rem",
             margin: "6rem auto",
             padding: "0 1.5rem",
             textAlign: "center",
-            fontFamily: "sans-serif",
+            fontFamily:
+              "ui-sans-serif, system-ui, -apple-system, sans-serif",
           }}
         >
-          <h1>Something went wrong</h1>
-          <p>Please try again in a moment.</p>
-          <button type="button" onClick={reset}>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: 600 }}>
+            Something went wrong
+          </h1>
+          <p style={{ color: "#5c5442" }}>Please try again in a moment.</p>
+          <button
+            type="button"
+            onClick={reset}
+            style={{
+              marginTop: "0.5rem",
+              height: "2.75rem",
+              padding: "0 1.5rem",
+              border: "1px solid #1f1b14",
+              background: "transparent",
+              color: "#1f1b14",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
             Retry
           </button>
         </div>

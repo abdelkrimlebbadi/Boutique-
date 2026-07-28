@@ -4,6 +4,9 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
+import { Tag } from "@/components/ui/Tag";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import type { CategoryView } from "@/lib/catalog/types";
 
 const COLORS = ["Noir", "Blanc"];
@@ -47,18 +50,25 @@ export function FiltersSidebar({ categories }: { categories: CategoryView[] }) {
 
   return (
     <aside
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-8"
       aria-busy={isPending}
       aria-label={t("filtersTitle")}
     >
       <div>
-        <h2 className="mb-2 text-sm font-semibold">{t("categoryLabel")}</h2>
-        <ul className="flex flex-col gap-1 text-sm">
+        <h2 className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">
+          {t("categoryLabel")}
+        </h2>
+        <ul className="flex flex-col gap-2 text-sm">
           <li>
             <button
               type="button"
               onClick={() => updateParam("category", null)}
-              className={!activeCategory ? "font-semibold" : "text-black/60 dark:text-white/60"}
+              aria-current={!activeCategory}
+              className={
+                !activeCategory
+                  ? "font-medium text-neutral-900"
+                  : "text-neutral-600 transition-colors duration-(--duration-base) hover:text-neutral-900"
+              }
             >
               {t("allCategories")}
             </button>
@@ -68,10 +78,11 @@ export function FiltersSidebar({ categories }: { categories: CategoryView[] }) {
               <button
                 type="button"
                 onClick={() => updateParam("category", category.slug)}
+                aria-current={activeCategory === category.slug}
                 className={
                   activeCategory === category.slug
-                    ? "font-semibold"
-                    : "text-black/60 dark:text-white/60"
+                    ? "font-medium text-neutral-900"
+                    : "text-neutral-600 transition-colors duration-(--duration-base) hover:text-neutral-900"
                 }
               >
                 {category.name}
@@ -82,83 +93,75 @@ export function FiltersSidebar({ categories }: { categories: CategoryView[] }) {
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold">{t("colorLabel")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">
+          {t("colorLabel")}
+        </h2>
         <div className="flex flex-wrap gap-2">
           {COLORS.map((color) => (
-            <button
+            <Tag
               key={color}
-              type="button"
+              pressed={activeColor === color}
               onClick={() => updateParam("color", activeColor === color ? null : color)}
-              aria-pressed={activeColor === color}
-              className={`rounded-full border px-3 py-1 text-sm ${
-                activeColor === color
-                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-black/20 dark:border-white/20"
-              }`}
             >
               {color}
-            </button>
+            </Tag>
           ))}
         </div>
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold">{t("sizeLabel")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">
+          {t("sizeLabel")}
+        </h2>
         <div className="flex flex-wrap gap-2">
           {SIZES.map((size) => (
-            <button
+            <Tag
               key={size}
-              type="button"
+              pressed={activeSize === size}
               onClick={() => updateParam("size", activeSize === size ? null : size)}
-              aria-pressed={activeSize === size}
-              className={`rounded-full border px-3 py-1 text-sm ${
-                activeSize === size
-                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-                  : "border-black/20 dark:border-white/20"
-              }`}
             >
               {size}
-            </button>
+            </Tag>
           ))}
         </div>
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold">{t("priceLabel")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">
+          {t("priceLabel")}
+        </h2>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="minPrice">
             {t("minPrice")}
           </label>
-          <input
+          <Input
             id="minPrice"
             type="number"
             min={0}
             placeholder={t("minPrice")}
             value={minPrice}
             onChange={(event) => setMinPrice(event.target.value)}
-            className="w-20 rounded-md border border-black/10 px-2 py-1 text-sm dark:border-white/20"
+            className="h-9 w-full"
           />
-          <span>–</span>
+          <span aria-hidden className="text-neutral-400">
+            –
+          </span>
           <label className="sr-only" htmlFor="maxPrice">
             {t("maxPrice")}
           </label>
-          <input
+          <Input
             id="maxPrice"
             type="number"
             min={0}
             placeholder={t("maxPrice")}
             value={maxPrice}
             onChange={(event) => setMaxPrice(event.target.value)}
-            className="w-20 rounded-md border border-black/10 px-2 py-1 text-sm dark:border-white/20"
+            className="h-9 w-full"
           />
-          <button
-            type="button"
-            onClick={applyPriceRange}
-            className="rounded-md border border-black/10 px-2 py-1 text-sm dark:border-white/20"
-          >
-            {t("applyFilters")}
-          </button>
         </div>
+        <Button variant="secondary" size="sm" onClick={applyPriceRange} className="mt-3 w-full">
+          {t("applyFilters")}
+        </Button>
       </div>
     </aside>
   );

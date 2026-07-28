@@ -20,7 +20,7 @@ export function LoadMoreLink({
   return (
     <Link
       href={`${basePath}?${params.toString()}`}
-      className="mx-auto rounded-md border border-black/10 px-4 py-2 text-sm dark:border-white/20"
+      className="inline-flex h-11 items-center border border-neutral-900 px-6 text-sm font-medium text-neutral-900 transition-colors duration-(--duration-base) ease-(--ease-standard) hover:border-accent-600 hover:text-accent-600"
     >
       {t("loadMore")}
     </Link>

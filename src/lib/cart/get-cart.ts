@@ -7,9 +7,24 @@ import { getPreferredCurrency } from "@/lib/currency/get-preferred-currency";
 import { EMPTY_CART, type CartItemView, type CartView } from "./types";
 import type { Locale } from "@/i18n/routing";
 
+// Cart display must never take the whole app down with it (e.g. layout.tsx
+// renders it on every page): any Supabase failure degrades to an empty
+// cart rather than throwing, same posture as getLatestFxRates.
 export async function getCart(locale: Locale): Promise<CartView> {
-  const supabase = await createClient();
   const currency = await getPreferredCurrency();
+  try {
+    return await loadCart(locale, currency);
+  } catch (error) {
+    console.error("getCart failed:", error);
+    return EMPTY_CART(currency);
+  }
+}
+
+async function loadCart(
+  locale: Locale,
+  currency: CartView["currency"]
+): Promise<CartView> {
+  const supabase = await createClient();
   const cartId = await resolveActiveCartId(supabase);
 
   if (!cartId) return EMPTY_CART(currency);

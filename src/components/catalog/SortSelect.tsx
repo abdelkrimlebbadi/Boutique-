@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import { Select } from "@/components/ui/Select";
 import type { SortOption } from "@/lib/catalog/types";
 
 export function SortSelect() {
@@ -20,17 +21,13 @@ export function SortSelect() {
   }
 
   return (
-    <label className="inline-flex items-center gap-2 text-sm">
+    <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
       <span>{t("sortLabel")}</span>
-      <select
-        value={sort}
-        onChange={(event) => onChange(event.target.value as SortOption)}
-        className="rounded-md border border-black/10 bg-transparent py-1 ps-2 pe-6 dark:border-white/20"
-      >
+      <Select value={sort} onChange={(event) => onChange(event.target.value as SortOption)}>
         <option value="newest">{t("sortNewest")}</option>
         <option value="price_asc">{t("sortPriceAsc")}</option>
         <option value="price_desc">{t("sortPriceDesc")}</option>
-      </select>
+      </Select>
     </label>
   );
 }

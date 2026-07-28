@@ -1,6 +1,10 @@
 {
   "common": {
-    "brand": "Boutique"
+    "brand": "Boutique",
+    "skipToContent": "Skip to main content",
+    "notFoundTitle": "Page not found",
+    "notFoundMessage": "The page you're looking for doesn't exist anymore.",
+    "backToHome": "Back to home"
   },
   "localeSwitcher": {
     "label": "Language"
@@ -19,12 +23,10 @@
     "title": "Welcome to Boutique",
     "subtitle": "Print-on-demand, shipped from Morocco to Europe and North America.",
     "heroCta": "Shop products",
-    "priceDemoTitle": "Converted price example",
-    "priceDemoDescription": "Base price converted to your currency, then rounded to a charm price.",
-    "ratesUnavailable": "Exchange rates are not available right now.",
     "categoriesTitle": "Categories",
     "bestsellersTitle": "Bestsellers",
-    "testimonialsTitle": "What our customers say"
+    "testimonialsTitle": "What our customers say",
+    "ratingLabel": "Rating: {rating} out of 5"
   },
   "cart": {
     "cartLabel": "Cart",
@@ -47,6 +49,7 @@
     "shippingEstimateResult": "Shipping to {country}: {price}",
     "shippingEstimateUnavailable": "Estimate unavailable for this country.",
     "outOfStock": "Out of stock",
+    "bestseller": "Bestseller",
     "from": "from"
   },
   "catalog": {
