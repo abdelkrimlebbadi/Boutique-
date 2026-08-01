@@ -1,0 +1,13 @@
+# Registers the admin-role Custom Access Token Auth Hook (see
+# supabase/migrations/20260728130000_admin_users_and_access_token_hook.sql).
+#
+# This alone is only sufficient if the project is deployed via a linked
+# Supabase CLI (`supabase db push` / `supabase link`). If deployment
+# happens another way, this hook must ALSO be enabled manually in
+# Supabase Dashboard -> Authentication -> Hooks, pointing at
+# custom_access_token_hook. Verify this after every deploy that touches
+# admin auth — do not assume this file alone activates the hook.
+
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"

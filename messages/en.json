@@ -1,0 +1,167 @@
+{
+  "common": {
+    "brand": "Boutique",
+    "skipToContent": "Skip to main content",
+    "notFoundTitle": "Page not found",
+    "notFoundMessage": "The page you're looking for doesn't exist anymore.",
+    "backToHome": "Back to home"
+  },
+  "localeSwitcher": {
+    "label": "Language"
+  },
+  "currencySwitcher": {
+    "label": "Currency"
+  },
+  "nav": {
+    "products": "Products",
+    "search": "Search"
+  },
+  "breadcrumb": {
+    "home": "Home"
+  },
+  "home": {
+    "title": "Welcome to Boutique",
+    "subtitle": "Print-on-demand, shipped from Morocco to Europe and North America.",
+    "heroCta": "Shop products",
+    "categoriesTitle": "Categories",
+    "bestsellersTitle": "Bestsellers",
+    "testimonialsTitle": "What our customers say",
+    "ratingLabel": "Rating: {rating} out of 5"
+  },
+  "cart": {
+    "cartLabel": "Cart",
+    "title": "Cart ({count})",
+    "empty": "Your cart is empty.",
+    "subtotal": "Subtotal",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "close": "Close cart",
+    "checkout": "Checkout"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "adding": "Adding...",
+    "selectSize": "Size",
+    "selectColor": "Color",
+    "sizeGuide": "Size guide",
+    "sizeGuideTitle": "Size guide",
+    "shippingEstimateTitle": "Estimated shipping",
+    "selectCountry": "Shipping country",
+    "shippingEstimateResult": "Shipping to {country}: {price}",
+    "shippingEstimateUnavailable": "Estimate unavailable for this country.",
+    "outOfStock": "Out of stock",
+    "bestseller": "Bestseller",
+    "from": "from"
+  },
+  "catalog": {
+    "filtersTitle": "Filters",
+    "categoryLabel": "Category",
+    "allCategories": "All categories",
+    "colorLabel": "Color",
+    "sizeLabel": "Size",
+    "priceLabel": "Price",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "applyFilters": "Apply",
+    "sortLabel": "Sort by",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: low to high",
+    "sortPriceDesc": "Price: high to low",
+    "loadMore": "Load more",
+    "noResults": "No products match these filters."
+  },
+  "search": {
+    "placeholder": "Search for a product...",
+    "title": "Search",
+    "resultsCount": "{count} result(s) for \"{query}\"",
+    "noResults": "No results for \"{query}\".",
+    "prompt": "Start typing to search."
+  },
+  "checkout": {
+    "steps": {
+      "cart": "Cart",
+      "address": "Address",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "confirmation": "Confirmation"
+    },
+    "cart": {
+      "title": "Your cart",
+      "empty": "Your cart is empty.",
+      "browseCta": "Browse the shop",
+      "subtotal": "Subtotal",
+      "continueCta": "Continue"
+    },
+    "address": {
+      "title": "Shipping address",
+      "contactEmail": "Email",
+      "fullName": "Full name",
+      "line1": "Address",
+      "line2": "Apartment, suite, etc.",
+      "city": "City",
+      "state": "State / Province",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "phone": "Phone",
+      "billingSameAsShipping": "Use the same address for billing",
+      "billingTitle": "Billing address",
+      "saving": "Saving...",
+      "continueCta": "Continue to shipping",
+      "error": "Couldn't save the address. Please try again."
+    },
+    "shipping": {
+      "title": "Shipping method",
+      "noRate": "No shipping rate is available for this address.",
+      "continueCta": "Continue to payment"
+    },
+    "payment": {
+      "title": "Payment",
+      "discountCodePlaceholder": "Discount code",
+      "applyCta": "Apply",
+      "removeCta": "Remove",
+      "discountApplied": "Code {code} applied",
+      "discountInvalid": "This discount code isn't valid.",
+      "payCta": "Pay",
+      "paying": "Redirecting...",
+      "cancelled": "Payment was cancelled. You can try again.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "errorMissingPrice": "Some items in your cart are no longer available.",
+      "errorNoShipping": "No shipping rate is available for this address.",
+      "errorInvalidDiscount": "This discount code is no longer valid.",
+      "errorOrderCreation": "Couldn't create the order. Please try again.",
+      "errorPaymentSession": "Couldn't start payment. Please try again."
+    },
+    "mockPay": {
+      "title": "Demo payment",
+      "description": "Amount due: {amount}",
+      "simulateSuccess": "Simulate a successful payment",
+      "simulateFailure": "Simulate a failed payment",
+      "error": "The simulation failed. Please try again."
+    },
+    "confirmation": {
+      "title": "Thank you for your order!",
+      "orderNumber": "Order {number}",
+      "statusPending": "Confirming payment...",
+      "statusPendingChecking": "Checking payment status...",
+      "statusPendingReassurance": "Confirmation can take a few minutes; you'll get an email as soon as payment is confirmed.",
+      "statusPaid": "Payment confirmed.",
+      "statusProcessing": "Order is being prepared.",
+      "statusShipped": "Order shipped.",
+      "statusFailed": "Payment failed.",
+      "statusDefault": "Order status updated.",
+      "itemsHeading": "Items",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "discount": "Discount",
+      "total": "Total",
+      "retryPayment": "Retry payment",
+      "backToShop": "Back to shop"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "discount": "Discount",
+      "total": "Total"
+    }
+  }
+}

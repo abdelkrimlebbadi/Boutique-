@@ -1,0 +1,78 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      # NEXT_PUBLIC_* vars are baked into the client bundle at build time —
+      # they must be present here, not just as Worker runtime secrets.
+      # Reuses SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY, the same secret names
+      # already used by fetch-fx-rates.yml, rather than duplicating them
+      # under a second name.
+      - name: Build and deploy
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.SITE_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy
+
+      # Server-only secrets the Worker reads from process.env at runtime
+      # (never exposed to the browser). wrangler secret put uploads them to
+      # the Worker directly — they are not part of the build output. Synced
+      # on every deploy so a secret updated in GitHub takes effect on the
+      # next push without a separate manual step; empty/unset ones are
+      # skipped rather than overwriting an existing Worker secret with "".
+      - name: Sync runtime secrets
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PAYMENT_PROVIDER: ${{ secrets.PAYMENT_PROVIDER }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          PAYPAL_WEBHOOK_ID: ${{ secrets.PAYPAL_WEBHOOK_ID }}
+          PAYPAL_API_BASE: ${{ secrets.PAYPAL_API_BASE }}
+          YOUCAN_PAY_PUBLIC_KEY: ${{ secrets.YOUCAN_PAY_PUBLIC_KEY }}
+          YOUCAN_PAY_SECRET_KEY: ${{ secrets.YOUCAN_PAY_SECRET_KEY }}
+          YOUCAN_PAY_WEBHOOK_SECRET: ${{ secrets.YOUCAN_PAY_WEBHOOK_SECRET }}
+          YOUCAN_PAY_API_BASE: ${{ secrets.YOUCAN_PAY_API_BASE }}
+          MOCK_WEBHOOK_SECRET: ${{ secrets.MOCK_WEBHOOK_SECRET }}
+          PRINTFUL_API_KEY: ${{ secrets.PRINTFUL_API_KEY }}
+          PRINTFUL_WEBHOOK_SECRET: ${{ secrets.PRINTFUL_WEBHOOK_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          ADMIN_BOOTSTRAP_SECRET: ${{ secrets.ADMIN_BOOTSTRAP_SECRET }}
+        run: |
+          for name in \
+            SUPABASE_SERVICE_ROLE_KEY PAYMENT_PROVIDER \
+            PAYPAL_CLIENT_ID PAYPAL_CLIENT_SECRET PAYPAL_WEBHOOK_ID PAYPAL_API_BASE \
+            YOUCAN_PAY_PUBLIC_KEY YOUCAN_PAY_SECRET_KEY YOUCAN_PAY_WEBHOOK_SECRET YOUCAN_PAY_API_BASE \
+            MOCK_WEBHOOK_SECRET \
+            PRINTFUL_API_KEY PRINTFUL_WEBHOOK_SECRET \
+            RESEND_API_KEY RESEND_FROM_EMAIL \
+            ADMIN_BOOTSTRAP_SECRET \
+          ; do
+            value="${!name}"
+            if [ -n "$value" ]; then
+              echo "Setting $name"
+              printf '%s' "$value" | npx wrangler secret put "$name"
+            else
+              echo "Skipping $name (no GitHub secret set)"
+            fi
+          done

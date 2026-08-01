@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — single source of truth for the visual identity.
+ * Palette: 1 neutral scale (warm stone, not cold gray) + 1 accent
+ * (terracotta) + semantic colors. Every text/background pairing below is
+ * chosen to clear WCAG AA (verified: 4.5:1 for normal text, 3:1 for large
+ * text/UI). neutral-500 and warning-500 are intentionally under 4.5:1 —
+ * see the usage notes next to them, they are for large text/decorative use
+ * only, never small body text.
+ */
+:root {
+  /* ---- Neutral (warm stone) ---- */
+  --color-neutral-0: #fbfaf7; /* paper background */
+  --color-neutral-100: #f1eee7; /* subtle surface */
+  --color-neutral-200: #e4dfd3; /* borders, dividers */
+  --color-neutral-300: #cfc7b4; /* strong borders */
+  --color-neutral-400: #a79c82; /* decorative / disabled only — 2.6:1, not for text */
+  --color-neutral-500: #7d735c; /* large text / icons only — 4.49:1, not for small body text */
+  --color-neutral-600: #5c5442; /* secondary body text — 7.2:1 */
+  --color-neutral-700: #453f31; /* body text — 10:1 */
+  --color-neutral-800: #2e2a21;
+  --color-neutral-900: #1f1b14; /* headings, ink — 16.4:1 */
+
+  /* ---- Accent (terracotta) ---- */
+  --color-accent-100: #f3ddd2;
+  --color-accent-500: #b5502e;
+  --color-accent-600: #943f22;
+  --color-accent-700: #7a3419;
+
+  /* ---- Semantic ---- */
+  --color-success-500: #4f6b3c;
+  --color-success-700: #3b4f2c;
+  --color-warning-500: #b98a2e; /* decorative/swatch only — 2.99:1, not for text */
+  --color-warning-700: #8c6a1f; /* text-safe warning — 4.79:1 */
+  --color-danger-500: #8b2e3c;
+  --color-danger-700: #6e2230;
+  --color-info-500: #3d5a73;
+
+  /* ---- Functional aliases ---- */
+  --color-bg: var(--color-neutral-0);
+  --color-surface: var(--color-neutral-100);
+  --color-border: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-text: var(--color-neutral-900);
+  --color-text-muted: var(--color-neutral-600);
+  --color-text-subtle: var(--color-neutral-500);
+  --color-on-accent: var(--color-neutral-0);
+  --color-focus-ring: var(--color-accent-600);
+
+  /* ---- Typography ---- */
+  --font-display: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+  --font-body: var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Mobile-first fluid scale: base value at 375px viewport, growing to the
+     max via clamp() so headings never jump abruptly at breakpoints. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6rem;
+  --text-md: 1.125rem;
+  --text-md--line-height: 1.75rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: clamp(1.375rem, 1.25rem + 0.6vw, 1.625rem);
+  --text-xl--line-height: 1.25;
+  --text-2xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.25rem);
+  --text-2xl--line-height: 1.15;
+  --text-3xl: clamp(2.25rem, 1.8rem + 2.2vw, 3.25rem);
+  --text-3xl--line-height: 1.08;
+  --text-4xl: clamp(2.75rem, 2rem + 3.6vw, 4.75rem);
+  --text-4xl--line-height: 1.02;
+
+  /* ---- Radius — deliberately restrained, no bubble corners ---- */
+  --radius-none: 0px;
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-full: 9999px;
+
+  /* ---- Motion — sober, short ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 180ms;
+
+  /* ---- Editorial container ---- */
+  --container-max: 90rem;
+  --container-pad: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --container-pad: 2rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  :root {
+    --container-pad: 3rem;
+  }
+}
+
+@theme inline {
+  --color-neutral-0: var(--color-neutral-0);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-500: var(--color-neutral-500);
+  --color-neutral-600: var(--color-neutral-600);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-neutral-800: var(--color-neutral-800);
+  --color-neutral-900: var(--color-neutral-900);
+
+  --color-accent-100: var(--color-accent-100);
+  --color-accent-500: var(--color-accent-500);
+  --color-accent-600: var(--color-accent-600);
+  --color-accent-700: var(--color-accent-700);
+
+  --color-success-500: var(--color-success-500);
+  --color-success-700: var(--color-success-700);
+  --color-warning-500: var(--color-warning-500);
+  --color-warning-700: var(--color-warning-700);
+  --color-danger-500: var(--color-danger-500);
+  --color-danger-700: var(--color-danger-700);
+  --color-info-500: var(--color-info-500);
+
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-subtle: var(--color-text-subtle);
+  --color-on-accent: var(--color-on-accent);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+
+  --text-xs: var(--text-xs);
+  --text-xs--line-height: var(--text-xs--line-height);
+  --text-sm: var(--text-sm);
+  --text-sm--line-height: var(--text-sm--line-height);
+  --text-base: var(--text-base);
+  --text-base--line-height: var(--text-base--line-height);
+  --text-md: var(--text-md);
+  --text-md--line-height: var(--text-md--line-height);
+  --text-lg: var(--text-lg);
+  --text-lg--line-height: var(--text-lg--line-height);
+  --text-xl: var(--text-xl);
+  --text-xl--line-height: var(--text-xl--line-height);
+  --text-2xl: var(--text-2xl);
+  --text-2xl--line-height: var(--text-2xl--line-height);
+  --text-3xl: var(--text-3xl);
+  --text-3xl--line-height: var(--text-3xl--line-height);
+  --text-4xl: var(--text-4xl);
+  --text-4xl--line-height: var(--text-4xl--line-height);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-full: var(--radius-full);
+
+  --ease-standard: var(--ease-standard);
+  --duration-fast: var(--duration-fast);
+  --duration-base: var(--duration-base);
+}
+
+/* Plain top-level pseudo-class-only selectors (`:focus-visible { }`,
+   `::selection { }`) get mangled by Tailwind's build pipeline outside of
+   @layer — the colon is stripped, turning them into invalid/no-op type
+   selectors that silently match nothing. @layer base is the documented
+   Tailwind v4 pattern for custom base styles and isn't subject to this. */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-accent-500);
+    color: var(--color-on-accent);
+  }
+
+  /* Visible, high-contrast focus ring on every interactive element reached
+     by keyboard — never suppressed. Mouse/touch users don't get the ring
+     (focus-visible), keyboard users always do. */
+  :focus-visible {
+    outline-width: 2px;
+    outline-style: solid;
+    outline-color: var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

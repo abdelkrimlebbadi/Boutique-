@@ -1,0 +1,123 @@
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getProducts } from "@/lib/catalog/get-products";
+import { getCategories } from "@/lib/catalog/get-categories";
+import { FiltersSidebar } from "@/components/catalog/FiltersSidebar";
+import { SortSelect } from "@/components/catalog/SortSelect";
+import { ProductCard } from "@/components/product/ProductCard";
+import { LoadMoreLink } from "@/components/catalog/LoadMoreLink";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { Container } from "@/components/ui/Container";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { buildMetadata } from "@/lib/seo/metadata";
+import type { Locale } from "@/i18n/routing";
+import type { SortOption } from "@/lib/catalog/types";
+
+type SearchParams = {
+  category?: string;
+  color?: string;
+  size?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  sort?: string;
+  cursor?: string;
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "nav" });
+  return buildMetadata({ title: t("products"), path: "/products", locale });
+}
+
+export default async function ProductsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale as Locale);
+  const sp = await searchParams;
+
+  const [catalogT, navT, breadcrumbT, categories, { items, nextCursor }] =
+    await Promise.all([
+      getTranslations("catalog"),
+      getTranslations("nav"),
+      getTranslations("breadcrumb"),
+      getCategories(locale as Locale),
+      getProducts({
+        locale: locale as Locale,
+        filters: {
+          category: sp.category,
+          color: sp.color,
+          size: sp.size,
+          minPriceCents: sp.minPrice
+            ? Math.round(Number(sp.minPrice) * 100)
+            : undefined,
+          maxPriceCents: sp.maxPrice
+            ? Math.round(Number(sp.maxPrice) * 100)
+            : undefined,
+        },
+        sort: (sp.sort as SortOption) ?? "newest",
+        cursor: sp.cursor,
+      }),
+    ]);
+
+  return (
+    <Container className="py-8 lg:py-12">
+      <JsonLd
+        data={breadcrumbSchema(
+          [
+            { name: breadcrumbT("home"), path: "" },
+            { name: navT("products"), path: "/products" },
+          ],
+          locale
+        )}
+      />
+
+      <h1 className="mb-8 font-display text-2xl font-semibold lg:mb-10 lg:text-3xl">
+        {navT("products")}
+      </h1>
+
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-[12rem_1fr] lg:gap-16">
+        <FiltersSidebar categories={categories} />
+
+        <div>
+          <div className="mb-6 flex items-center justify-between border-b border-neutral-200 pb-4">
+            <p className="text-sm text-neutral-600">{items.length}</p>
+            <SortSelect />
+          </div>
+
+          {items.length === 0 ? (
+            <p className="text-sm text-neutral-600">{catalogT("noResults")}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6">
+              {items.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  priority={index < 4}
+                />
+              ))}
+            </div>
+          )}
+
+          {nextCursor && (
+            <div className="mt-10 flex justify-center">
+              <LoadMoreLink
+                basePath="/products"
+                searchParams={sp}
+                nextCursor={nextCursor}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </Container>
+  );
+}
