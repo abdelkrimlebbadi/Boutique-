@@ -24,7 +24,11 @@ export async function adminLogin(
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: "Identifiants invalides." };
+  // Temporarily surfacing the raw Supabase error message (instead of the
+  // generic "Identifiants invalides.") to diagnose a live login failure —
+  // revert to the generic message once resolved, this leaks provider-level
+  // detail an attacker could use to enumerate accounts.
+  if (error) return { error: `Identifiants invalides (${error.message}).` };
 
   redirect("/admin");
 }
