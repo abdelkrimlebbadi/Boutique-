@@ -48,20 +48,26 @@ async function handleAdminRequest(request: NextRequest): Promise<NextResponse> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return NextResponse.redirect(new URL("/admin/login", request.url));
+    // Temporary diagnostic query param on each bounce, to tell apart "no
+    // session reached the middleware at all" (cookie propagation) from
+    // "session present but missing the admin claim" (access token hook) —
+    // remove once the live login issue is resolved.
+    if (!user) {
+      return NextResponse.redirect(new URL("/admin/login?reason=no-session", request.url));
+    }
 
     const {
       data: { session },
     } = await supabase.auth.getSession();
     const claims = session ? decodeJwtPayload(session.access_token) : {};
     if (claims.user_role !== "admin") {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+      return NextResponse.redirect(new URL("/admin/login?reason=no-admin-claim", request.url));
     }
 
     return response;
   } catch (error) {
     console.error("handleAdminRequest failed:", error);
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return NextResponse.redirect(new URL("/admin/login?reason=middleware-error", request.url));
   }
 }
 
