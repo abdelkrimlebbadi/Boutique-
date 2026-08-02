@@ -2,7 +2,7 @@
 
 import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
@@ -55,33 +55,43 @@ export async function bootstrapFirstAdmin(
     return { error: "Configuration invalide." };
   }
 
-  const serviceRole = createServiceRoleClient();
+  try {
+    const serviceRole = createServiceRoleClient();
 
-  const { count } = await serviceRole
-    .from("admin_users")
-    .select("id", { count: "exact", head: true });
-  if (count && count > 0) {
-    return { error: "Un compte administrateur existe déjà." };
-  }
+    const { count } = await serviceRole
+      .from("admin_users")
+      .select("id", { count: "exact", head: true });
+    if (count && count > 0) {
+      return { error: "Un compte administrateur existe déjà." };
+    }
 
-  const { data: created, error: createUserError } = await serviceRole.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
-  if (createUserError || !created.user) {
-    return { error: createUserError?.message ?? "Impossible de créer le compte." };
-  }
+    const { data: created, error: createUserError } = await serviceRole.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+    if (createUserError || !created.user) {
+      return { error: createUserError?.message ?? "Impossible de créer le compte." };
+    }
 
-  const { data: bootstrapped, error: bootstrapError } = await serviceRole.rpc(
-    "bootstrap_admin_if_empty",
-    { p_user_id: created.user.id }
-  );
-  if (bootstrapError || !bootstrapped) {
-    return {
-      error:
-        "Un autre compte administrateur a été créé entre-temps. Connectez-vous avec ce compte.",
-    };
+    const { data: bootstrapped, error: bootstrapError } = await serviceRole.rpc(
+      "bootstrap_admin_if_empty",
+      { p_user_id: created.user.id }
+    );
+    if (bootstrapError || !bootstrapped) {
+      return {
+        error:
+          "Un autre compte administrateur a été créé entre-temps. Connectez-vous avec ce compte.",
+      };
+    }
+  } catch (caughtError) {
+    // A thrown (not returned) error here means something unexpected broke
+    // the request itself (network/runtime failure) rather than a normal
+    // Supabase API rejection — surface it verbatim instead of a generic
+    // message so a misconfiguration is diagnosable from the rendered page.
+    unstable_rethrow(caughtError);
+    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+    return { error: `Erreur technique : ${message}` };
   }
 
   redirect("/admin/login");
