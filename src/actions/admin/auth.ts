@@ -24,11 +24,7 @@ export async function adminLogin(
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  // Temporarily surfacing the raw Supabase error message (instead of the
-  // generic "Identifiants invalides.") to diagnose a live login failure —
-  // revert to the generic message once resolved, this leaks provider-level
-  // detail an attacker could use to enumerate accounts.
-  if (error) return { error: `Identifiants invalides (${error.message}).` };
+  if (error) return { error: "Identifiants invalides." };
 
   redirect("/admin");
 }
@@ -91,11 +87,11 @@ export async function bootstrapFirstAdmin(
   } catch (caughtError) {
     // A thrown (not returned) error here means something unexpected broke
     // the request itself (network/runtime failure) rather than a normal
-    // Supabase API rejection — surface it verbatim instead of a generic
-    // message so a misconfiguration is diagnosable from the rendered page.
+    // Supabase API rejection — log the detail server-side, keep the
+    // client-facing message generic.
     unstable_rethrow(caughtError);
-    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
-    return { error: `Erreur technique : ${message}` };
+    console.error("bootstrapFirstAdmin failed:", caughtError);
+    return { error: "Erreur technique. Réessayez dans un instant." };
   }
 
   redirect("/admin/login");
