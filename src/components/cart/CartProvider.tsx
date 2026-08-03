@@ -84,7 +84,6 @@ export function CartProvider({
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [optimisticCart, setOptimisticCart] = useOptimistic(
     initialCart,
@@ -94,11 +93,9 @@ export function CartProvider({
 
   function addItem(input: AddToCartInput, quantity: number) {
     setIsOpen(true);
-    setError(null);
     startTransition(async () => {
       setOptimisticCart({ input, quantity });
-      const result = await addToCartAction({ variantId: input.variantId, quantity });
-      if (result?.error) setError(result.error);
+      await addToCartAction({ variantId: input.variantId, quantity });
     });
   }
 
@@ -113,14 +110,6 @@ export function CartProvider({
         addItem,
       }}
     >
-      {/* Temporary diagnostic banner: surfaces the real addToCart failure,
-          which Next.js otherwise replaces with an opaque digest in
-          production. Remove together with the try/catch in actions/cart.ts. */}
-      {error && (
-        <div className="fixed inset-x-0 top-0 z-[100] bg-red-700 p-3 text-center text-sm text-white">
-          {error}
-        </div>
-      )}
       {children}
     </CartContext.Provider>
   );
