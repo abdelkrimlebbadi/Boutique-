@@ -22,7 +22,8 @@ async function getAccessToken(): Promise<string> {
     throw new Error("PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET not configured");
   }
 
-  const response = await fetch(`${getApiBase()}/v1/oauth2/token`, {
+  const url = `${getApiBase()}/v1/oauth2/token`;
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
@@ -32,7 +33,13 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error(`PayPal OAuth token request failed: ${response.status}`);
+    // Temporary: include the exact URL/base — a 404 here almost always
+    // means PAYPAL_API_BASE has stray whitespace or a trailing slash from a
+    // copy-paste, invisible in the Dashboard's secret input. Revert once
+    // resolved.
+    throw new Error(
+      `PayPal OAuth token request failed: ${response.status} url=${JSON.stringify(url)} base=${JSON.stringify(getApiBase())}`
+    );
   }
 
   const body = (await response.json()) as { access_token: string; expires_in: number };
