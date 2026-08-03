@@ -22,24 +22,16 @@ export function MockPayButtons({
 }) {
   const t = useTranslations("checkout.mockPay");
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   function simulate(outcome: "success" | "failure") {
-    setError(null);
+    setError(false);
     startTransition(async () => {
       try {
-        const result = await simulateMockPayment({
-          orderId,
-          externalId,
-          amountCents,
-          currency,
-          outcome,
-          locale,
-        });
-        if (result?.error) setError(result.error);
+        await simulateMockPayment({ orderId, externalId, amountCents, currency, outcome, locale });
       } catch (submitError) {
         unstable_rethrow(submitError);
-        setError(t("error"));
+        setError(true);
       }
     });
   }
@@ -52,7 +44,7 @@ export function MockPayButtons({
       <Button variant="secondary" onClick={() => simulate("failure")} disabled={isPending}>
         {t("simulateFailure")}
       </Button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600">{t("error")}</p>}
     </div>
   );
 }
