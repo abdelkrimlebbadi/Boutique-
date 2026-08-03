@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { resolveActiveCartId } from "@/lib/cart/resolve-cart-id";
 import { computeOrderPricing } from "@/lib/checkout/compute-order-pricing";
@@ -32,16 +33,37 @@ export default async function CheckoutPaymentPage({
   const { error, cancelled } = await searchParams;
   setRequestLocale(locale as Locale);
   const t = await getTranslations("checkout.payment");
+  const tCart = await getTranslations("checkout.cart");
+
+  const errorKey =
+    error && error in ERROR_KEYS ? ERROR_KEYS[error as keyof typeof ERROR_KEYS] : null;
 
   const supabase = await createClient();
   const cartId = await resolveActiveCartId(supabase);
-  if (!cartId) redirect(`/${locale}/checkout`);
+  const { data: cartItemRows } = cartId
+    ? await supabase.from("cart_items").select("variant_id, quantity").eq("cart_id", cartId)
+    : { data: null };
 
-  const { data: cartItemRows } = await supabase
-    .from("cart_items")
-    .select("variant_id, quantity")
-    .eq("cart_id", cartId);
-  if (!cartItemRows || cartItemRows.length === 0) redirect(`/${locale}/checkout`);
+  // A failed payment normally hands the cart back (see
+  // releaseCartAfterFailedPayment), so this page can show the error with the
+  // order still intact. If that restore couldn't happen, showing the error on
+  // its own is still far better than silently bouncing to an empty cart.
+  if (!cartId || !cartItemRows || cartItemRows.length === 0) {
+    if (!errorKey) redirect(`/${locale}/checkout`);
+    return (
+      <Container className="max-w-2xl py-8 lg:py-12">
+        <CheckoutSteps current="payment" />
+        <h1 className="mb-6 font-display text-2xl font-semibold lg:text-3xl">{t("title")}</h1>
+        <p className="mb-6 text-sm text-red-600">{t(errorKey)}</p>
+        <Link
+          href="/products"
+          className="text-sm underline underline-offset-2 transition-colors duration-(--duration-base) hover:text-accent-600"
+        >
+          {tCart("browseCta")}
+        </Link>
+      </Container>
+    );
+  }
 
   const { shippingAddressId } = await getCheckoutAddressIds();
   if (!shippingAddressId) redirect(`/${locale}/checkout/address`);
@@ -63,9 +85,6 @@ export default async function CheckoutPaymentPage({
     locale: locale as Locale,
     discountCode,
   });
-
-  const errorKey =
-    error && error in ERROR_KEYS ? ERROR_KEYS[error as keyof typeof ERROR_KEYS] : null;
 
   return (
     <Container className="max-w-2xl py-8 lg:py-12">
