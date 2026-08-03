@@ -11,10 +11,10 @@ import type {
 
 // For local dev and demos: never marks anything paid synchronously. It
 // redirects to an internal page where a human clicks "simulate success/
-// failure", which POSTs a signed payload to /api/webhooks/mock — the exact
-// same verify → claim → process path a real provider's webhook goes
-// through, so the idempotence machinery is genuinely exercised, not
-// bypassed.
+// failure", which signs a payload and runs it through
+// processPaymentWebhook — the exact same verify → claim → process path a
+// real provider's webhook goes through, so the idempotence machinery is
+// genuinely exercised, not bypassed.
 const mockWebhookPayloadSchema = z.object({
   orderId: z.string().uuid(),
   externalId: z.string().min(1),
