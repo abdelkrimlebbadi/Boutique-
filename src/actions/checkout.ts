@@ -7,6 +7,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { resolveActiveCartId } from "@/lib/cart/resolve-cart-id";
 import { computeOrderPricing } from "@/lib/checkout/compute-order-pricing";
 import { processPaymentWebhook } from "@/lib/checkout/process-payment-webhook";
+import { handlePaymentSucceeded } from "@/lib/checkout/handle-payment-event";
 import { getPreferredCurrency } from "@/lib/currency/get-preferred-currency";
 import { getPaymentProviderByName, getPaymentProviderName } from "@/lib/payments/select-provider";
 import { addressSchema, type AddressInput } from "@/lib/validation/address";
@@ -163,6 +164,53 @@ export async function getOrderStatus(
 
   const { data } = await supabase.from("orders").select("status").eq("id", orderId).maybeSingle();
   return data?.status ?? null;
+}
+
+// Called when the customer lands back from a provider whose approval step
+// doesn't settle the payment (PayPal — see PaymentProvider.captureOnReturn).
+// The matching webhook would also settle the order, but only eventually and
+// only if webhook delivery is healthy; capturing here is what actually
+// charges the customer, so it can't be left to that.
+export async function finalizePaymentReturn(rawOrderId: string): Promise<void> {
+  const orderId = orderIdSchema.parse(rawOrderId);
+
+  // RLS-scoped read first: "read own orders" means a visitor can only ever
+  // finalise an order that is genuinely theirs.
+  const supabase = await createClient();
+  const { data: ownOrder } = await supabase
+    .from("orders")
+    .select("id")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!ownOrder) return;
+
+  const serviceRole = createServiceRoleClient();
+  const { data: order } = await serviceRole
+    .from("orders")
+    .select("id, status, payment_provider, payment_ref")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order || order.status !== "pending" || !order.payment_ref) return;
+
+  const provider = getPaymentProviderByName(order.payment_provider);
+  if (!provider.captureOnReturn) return;
+
+  const capture = await provider.captureOnReturn(order.payment_ref);
+  if (!capture) return;
+
+  // Idempotent on `status = 'pending'`, so the webhook arriving later for
+  // the same capture is a no-op rather than a double-processing.
+  await handlePaymentSucceeded(
+    {
+      kind: "payment_succeeded",
+      orderId: order.id,
+      externalId: capture.paymentRef,
+      paymentRef: capture.paymentRef,
+      amountCents: capture.amountCents,
+      currency: capture.currency,
+    },
+    order.payment_provider
+  );
 }
 
 // ---------------------------------------------------------------------------

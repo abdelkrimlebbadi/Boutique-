@@ -3,6 +3,7 @@ import { z } from "zod";
 import { paypalFetch } from "./client";
 import { WebhookVerificationError } from "@/lib/payments/verify-hmac";
 import type {
+  CaptureResult,
   CreateSessionInput,
   CreateSessionResult,
   PaymentProvider,
@@ -18,6 +19,15 @@ type PayPalOrderResponse = {
 type PayPalCaptureResponse = {
   id: string;
   amount?: { currency_code: string };
+};
+
+type PayPalCaptureOrderResponse = {
+  id: string;
+  purchase_units?: {
+    payments?: {
+      captures?: { id: string; amount: { currency_code: string; value: string } }[];
+    };
+  }[];
 };
 
 const webhookEventSchema = z.object({
@@ -78,6 +88,37 @@ export class PayPalProvider implements PaymentProvider {
     }
 
     return { redirectUrl: approveLink.href, externalId: order.id };
+  }
+
+  // Approving a PayPal order does not move any money: with intent CAPTURE
+  // the buyer's approval only authorises it, and nothing is charged — nor
+  // is any PAYMENT.CAPTURE.* webhook emitted — until this call. Without it
+  // an order would sit `pending` forever after an apparently successful
+  // checkout.
+  async captureOnReturn(externalId: string): Promise<CaptureResult | null> {
+    let response: PayPalCaptureOrderResponse;
+    try {
+      response = await paypalFetch<PayPalCaptureOrderResponse>(
+        `/v2/checkout/orders/${externalId}/capture`,
+        { method: "POST", body: {} }
+      );
+    } catch (error) {
+      // Already captured — the customer reloaded the return URL, or opened
+      // it twice. The payment stands; leave it to the webhook/poller.
+      if (error instanceof Error && error.message.includes("ORDER_ALREADY_CAPTURED")) {
+        return null;
+      }
+      throw error;
+    }
+
+    const capture = response.purchase_units?.[0]?.payments?.captures?.[0];
+    if (!capture) return null;
+
+    return {
+      paymentRef: capture.id,
+      amountCents: Math.round(parseFloat(capture.amount.value) * 100),
+      currency: capture.amount.currency_code,
+    };
   }
 
   async verifyWebhook(input: VerifyWebhookInput): Promise<VerifiedEvent> {
