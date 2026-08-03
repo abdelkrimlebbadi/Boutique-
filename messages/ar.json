@@ -51,7 +51,30 @@
     "shippingEstimateUnavailable": "التقدير غير متوفر لهذا البلد.",
     "outOfStock": "غير متوفر",
     "bestseller": "الأكثر مبيعًا",
-    "from": "ابتداءً من"
+    "from": "ابتداءً من",
+    "customize": {
+      "openButton": "تخصيص هذا المنتج",
+      "closeButton": "إغلاق التخصيص",
+      "uploadLabel": "إضافة صورة",
+      "uploadHint": "JPG أو PNG، 10 ميغابايت كحد أقصى",
+      "uploading": "جارٍ الرفع...",
+      "uploadError": "ملف صورة غير صالح (يلزم JPG أو PNG)",
+      "uploadTooLarge": "الملف كبير جدًا (10 ميغابايت كحد أقصى)",
+      "rightsCheckbox": "أؤكد أنني أملك حقوق هذه الصورة",
+      "rightsRequired": "يرجى تأكيد أنك تملك حقوق هذه الصورة.",
+      "textPlaceholder": "نصك",
+      "fontLabel": "الخط",
+      "colorLabel": "اللون",
+      "sizeLabel": "حجم النص",
+      "removeImage": "إزالة الصورة",
+      "removeText": "إزالة النص",
+      "addCustomToCart": "إضافة التصميم إلى السلة",
+      "emptyDesign": "أضف صورة أو نصًا للمتابعة.",
+      "font_sans": "بلا زوائد",
+      "font_serif": "بزوائد",
+      "font_mono": "أحادي المسافة",
+      "font_script": "مخطوطة"
+    }
   },
   "catalog": {
     "filtersTitle": "التصفية",
@@ -129,7 +152,11 @@
       "errorNoShipping": "لا يتوفر تعريفة شحن لهذا العنوان.",
       "errorInvalidDiscount": "رمز الخصم هذا لم يعد صالحًا.",
       "errorOrderCreation": "تعذر إنشاء الطلب. يرجى المحاولة مرة أخرى.",
-      "errorPaymentSession": "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى."
+      "errorPaymentSession": "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.",
+      "preparingDesigns": "جارٍ تحضير تصميمك المخصص...",
+      "designPreparationError": "تعذر تحضير تصميم مخصص.",
+      "designPreparationRetry": "إعادة المحاولة",
+      "errorMissingDesign": "تعذر تحضير تصميم مخصص. يرجى المحاولة مرة أخرى."
     },
     "mockPay": {
       "title": "دفع تجريبي",

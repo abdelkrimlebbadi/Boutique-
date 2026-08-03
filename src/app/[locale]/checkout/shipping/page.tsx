@@ -42,7 +42,16 @@ export default async function CheckoutShippingPage({
 
   const currency = await getPreferredCurrency();
   const pricing = await computeOrderPricing({
-    cartItems: cartItemRows.map((row) => ({ variantId: row.variant_id, quantity: row.quantity })),
+    // Display-only running total — the design isn't finalized yet at this
+    // step (that happens on the payment page, right before "Payer"), and
+    // pricing never depends on whether a design is attached, so the
+    // MISSING_DESIGN guard doesn't apply here.
+    cartItems: cartItemRows.map((row) => ({
+      variantId: row.variant_id,
+      quantity: row.quantity,
+      hasCustomDesign: false,
+      customDesignPrintFileUrl: null,
+    })),
     currency,
     countryCode: shippingAddressRow.country_code,
     locale: locale as Locale,

@@ -88,6 +88,16 @@ insert into product_variants (id, product_id, sku, size, color, stock_policy, we
   ('30000000-0000-4000-8000-000000000010', '20000000-0000-4000-8000-000000000004', 'PO-SAHARA-A3', 'A3', null, 'made_to_order', 120),
   ('30000000-0000-4000-8000-000000000011', '20000000-0000-4000-8000-000000000004', 'PO-SAHARA-A2', 'A2', null, 'made_to_order', 200);
 
+-- Print areas (personnalisation) for a subset of variants, so the feature
+-- is exercisable against the demo catalog — this seed only has t-shirts,
+-- a hoodie and a poster (no tote bag/mug products yet), so only those two
+-- shapes get one. Standard DTG chest print (12"x16" @ 300 DPI) and a
+-- full-bleed A3 print (11.69"x16.54" @ 300 DPI), rounded to whole pixels.
+update product_variants set print_area_width_px = 3600, print_area_height_px = 4800, print_area_dpi = 300
+  where id = '30000000-0000-4000-8000-000000000001';
+update product_variants set print_area_width_px = 3507, print_area_height_px = 4961, print_area_dpi = 300
+  where id = '30000000-0000-4000-8000-000000000010';
+
 insert into prices (variant_id, currency, amount_cents) values
   ('30000000-0000-4000-8000-000000000001', 'USD', 2499),
   ('30000000-0000-4000-8000-000000000002', 'USD', 2499),

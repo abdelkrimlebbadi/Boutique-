@@ -76,6 +76,9 @@ export type ProductEditData = {
     printfulVariantId: string | null;
     stockPolicy: StockPolicy;
     weightGrams: number | null;
+    printAreaWidthPx: number | null;
+    printAreaHeightPx: number | null;
+    printAreaDpi: number | null;
     prices: { currency: Currency; amountCents: number; compareAtCents: number | null }[];
   }[];
   categoryIds: string[];
@@ -151,6 +154,9 @@ export async function getProductForEdit(productId: string): Promise<ProductEditD
       printfulVariantId: variant.printful_variant_id,
       stockPolicy: variant.stock_policy,
       weightGrams: variant.weight_grams,
+      printAreaWidthPx: variant.print_area_width_px,
+      printAreaHeightPx: variant.print_area_height_px,
+      printAreaDpi: variant.print_area_dpi,
       prices: (variant.prices ?? []).map((price) => ({
         currency: price.currency as Currency,
         amountCents: price.amount_cents,

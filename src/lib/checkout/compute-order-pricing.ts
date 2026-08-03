@@ -23,6 +23,7 @@ export type OrderPricingItem = {
   unitPriceCents: number;
   quantity: number;
   lineTotalCents: number;
+  customDesignPrintFileUrl: string | null;
 };
 
 export type OrderPricing = {
@@ -39,7 +40,8 @@ export type OrderPricingError =
   | "EMPTY_CART"
   | "MISSING_PRICE"
   | "NO_SHIPPING_RATE"
-  | "INVALID_DISCOUNT_CODE";
+  | "INVALID_DISCOUNT_CODE"
+  | "MISSING_DESIGN";
 
 export type OrderPricingResult =
   | { ok: true; pricing: OrderPricing }
@@ -51,7 +53,12 @@ export type OrderPricingResult =
 // before creating the order — nothing here ever trusts a client-supplied
 // amount.
 export async function computeOrderPricing(params: {
-  cartItems: { variantId: string; quantity: number }[];
+  cartItems: {
+    variantId: string;
+    quantity: number;
+    hasCustomDesign: boolean;
+    customDesignPrintFileUrl: string | null;
+  }[];
   currency: Currency;
   countryCode: string;
   locale: Locale;
@@ -85,6 +92,14 @@ export async function computeOrderPricing(params: {
   let totalWeightGrams = 0;
 
   for (const cartItem of params.cartItems) {
+    // A customized line whose print file was never flattened (the customer
+    // reached this point before DesignCompositor finished, or it failed)
+    // must never become an infulfillable order — block, don't fall back to
+    // sending Printful nothing.
+    if (cartItem.hasCustomDesign && !cartItem.customDesignPrintFileUrl) {
+      return { ok: false, error: "MISSING_DESIGN" };
+    }
+
     const variant = variantById.get(cartItem.variantId);
     if (!variant) return { ok: false, error: "MISSING_PRICE" };
 
@@ -118,6 +133,7 @@ export async function computeOrderPricing(params: {
       unitPriceCents: displayPrice.amountCents,
       quantity: cartItem.quantity,
       lineTotalCents,
+      customDesignPrintFileUrl: cartItem.customDesignPrintFileUrl,
     });
   }
 

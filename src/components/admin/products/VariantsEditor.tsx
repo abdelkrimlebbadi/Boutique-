@@ -19,6 +19,9 @@ function emptyVariant(): VariantValue {
     printfulVariantId: null,
     stockPolicy: "made_to_order",
     weightGrams: null,
+    printAreaWidthPx: null,
+    printAreaHeightPx: null,
+    printAreaDpi: null,
     prices: [{ currency: "USD", amountCents: 0, compareAtCents: null }],
   };
 }
@@ -102,6 +105,56 @@ function VariantRow({
             onChange={(e) => setUsdAmount(Number(e.target.value))}
           />
         </label>
+      </div>
+
+      <div className="mt-3 border-t border-black pt-3">
+        <span className="mb-2 block text-xs">
+          Zone d&apos;impression (personnalisation) — laisser vide si non personnalisable
+        </span>
+        <div className="grid grid-cols-3 gap-2">
+          <label className="flex flex-col gap-1 text-xs">
+            <span>Largeur (px)</span>
+            <Input
+              type="number"
+              min={1}
+              value={value.printAreaWidthPx ?? ""}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  printAreaWidthPx: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs">
+            <span>Hauteur (px)</span>
+            <Input
+              type="number"
+              min={1}
+              value={value.printAreaHeightPx ?? ""}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  printAreaHeightPx: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs">
+            <span>DPI</span>
+            <Input
+              type="number"
+              min={1}
+              value={value.printAreaDpi ?? ""}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  printAreaDpi: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </label>
+        </div>
       </div>
 
       <button

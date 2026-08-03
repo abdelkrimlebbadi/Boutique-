@@ -13,6 +13,7 @@ export type CartItemView = {
   imageAlt: string | null;
   unitPriceCents: number;
   lineTotalCents: number;
+  customDesignImageUrl: string | null;
 };
 
 export type CartView = {

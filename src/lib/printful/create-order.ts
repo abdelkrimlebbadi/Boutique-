@@ -22,6 +22,7 @@ export type PrintfulOrderItem = {
   quantity: number;
   retailPriceCents: number;
   currency: string;
+  printFileUrl?: string | null;
 };
 
 export type CreatePrintfulOrderParams = {
@@ -61,6 +62,9 @@ export async function createPrintfulOrder(
         variant_id: item.printfulVariantId,
         quantity: item.quantity,
         retail_price: (item.retailPriceCents / 100).toFixed(2),
+        ...(item.printFileUrl
+          ? { files: [{ type: "default", url: item.printFileUrl }] }
+          : {}),
       })),
     }),
   });

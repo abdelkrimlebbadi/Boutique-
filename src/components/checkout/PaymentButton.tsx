@@ -7,7 +7,13 @@ import { startPayment } from "@/actions/checkout";
 import { Button } from "@/components/ui/Button";
 import type { Locale } from "@/i18n/routing";
 
-export function PaymentButton({ locale }: { locale: Locale }) {
+export function PaymentButton({
+  locale,
+  disabled = false,
+}: {
+  locale: Locale;
+  disabled?: boolean;
+}) {
   const t = useTranslations("checkout.payment");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
@@ -26,7 +32,7 @@ export function PaymentButton({ locale }: { locale: Locale }) {
 
   return (
     <div>
-      <Button onClick={onClick} disabled={isPending} className="w-full">
+      <Button onClick={onClick} disabled={isPending || disabled} className="w-full">
         {isPending ? t("paying") : t("payCta")}
       </Button>
       {error && <p className="mt-2 text-sm text-red-600">{t("errorGeneric")}</p>}

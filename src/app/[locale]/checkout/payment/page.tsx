@@ -10,7 +10,9 @@ import { Container } from "@/components/ui/Container";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { DiscountCodeForm } from "@/components/checkout/DiscountCodeForm";
-import { PaymentButton } from "@/components/checkout/PaymentButton";
+import { PaymentSection } from "@/components/checkout/PaymentSection";
+import type { PendingDesign } from "@/components/checkout/DesignCompositor";
+import { designStateSchema } from "@/lib/validation/custom-design";
 import type { Locale } from "@/i18n/routing";
 
 const ERROR_KEYS = {
@@ -20,6 +22,7 @@ const ERROR_KEYS = {
   INVALID_DISCOUNT_CODE: "errorInvalidDiscount",
   ORDER_CREATION_FAILED: "errorOrderCreation",
   PAYMENT_SESSION_FAILED: "errorPaymentSession",
+  MISSING_DESIGN: "errorMissingDesign",
 } as const;
 
 export default async function CheckoutPaymentPage({
@@ -41,7 +44,13 @@ export default async function CheckoutPaymentPage({
   const supabase = await createClient();
   const cartId = await resolveActiveCartId(supabase);
   const { data: cartItemRows } = cartId
-    ? await supabase.from("cart_items").select("variant_id, quantity").eq("cart_id", cartId)
+    ? await supabase
+        .from("cart_items")
+        .select(
+          `id, variant_id, quantity, custom_design_state, custom_design_print_file_url,
+           product_variants ( print_area_width_px, print_area_height_px, print_area_dpi )`
+        )
+        .eq("cart_id", cartId)
     : { data: null };
 
   // A failed payment normally hands the cart back (see
@@ -79,12 +88,48 @@ export default async function CheckoutPaymentPage({
   const discountCode = await getCheckoutDiscountCode();
 
   const pricing = await computeOrderPricing({
-    cartItems: cartItemRows.map((row) => ({ variantId: row.variant_id, quantity: row.quantity })),
+    // Display-only running total for this page's OrderSummary — the design
+    // may not be finalized yet at first render (that's exactly what
+    // DesignCompositor below is about to do), so MISSING_DESIGN must not
+    // block rendering here. startPayment (triggered only once
+    // DesignCompositor reports ready) is the actual enforcement point.
+    cartItems: cartItemRows.map((row) => ({
+      variantId: row.variant_id,
+      quantity: row.quantity,
+      hasCustomDesign: false,
+      customDesignPrintFileUrl: null,
+    })),
     currency,
     countryCode: shippingAddressRow.country_code,
     locale: locale as Locale,
     discountCode,
   });
+
+  // Cart lines with a design that hasn't been flattened into a print file
+  // yet — DesignCompositor produces custom_design_print_file_url for each
+  // of these before PaymentButton unlocks. A line configured without a
+  // valid print area or with malformed state is skipped here rather than
+  // fabricated; compute-order-pricing's MISSING_DESIGN check is the real
+  // gate that blocks startPayment if one still lacks a print file.
+  const pendingDesigns: PendingDesign[] = [];
+  for (const row of cartItemRows) {
+    if (!row.custom_design_state || row.custom_design_print_file_url) continue;
+    const variant = row.product_variants;
+    if (!variant?.print_area_width_px || !variant.print_area_height_px || !variant.print_area_dpi) {
+      continue;
+    }
+    const parsedState = designStateSchema.safeParse(row.custom_design_state);
+    if (!parsedState.success) continue;
+    pendingDesigns.push({
+      cartItemId: row.id,
+      state: parsedState.data,
+      printArea: {
+        widthPx: variant.print_area_width_px,
+        heightPx: variant.print_area_height_px,
+        dpi: variant.print_area_dpi,
+      },
+    });
+  }
 
   return (
     <Container className="max-w-2xl py-8 lg:py-12">
@@ -100,7 +145,7 @@ export default async function CheckoutPaymentPage({
 
           <DiscountCodeForm appliedCode={discountCode} />
           <OrderSummary pricing={pricing.pricing} currency={currency} locale={locale as Locale} />
-          <PaymentButton locale={locale as Locale} />
+          <PaymentSection locale={locale as Locale} pendingDesigns={pendingDesigns} />
         </div>
       )}
     </Container>

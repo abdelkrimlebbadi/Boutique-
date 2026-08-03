@@ -6,6 +6,11 @@ import { getDisplayPrice } from "@/lib/currency/get-display-price";
 import type { Locale } from "@/i18n/routing";
 import type { Currency } from "@/lib/currency/constants";
 
+// Print area: all three or none. The customizer only ever renders when a
+// variant has all three set and positive — never a fabricated default (see
+// supabase/migrations/20260728140000_product_variant_print_area.sql).
+export type PrintArea = { widthPx: number; heightPx: number; dpi: number };
+
 export type ProductVariantView = {
   id: string;
   sku: string;
@@ -14,6 +19,7 @@ export type ProductVariantView = {
   weightGrams: number | null;
   priceCents: number;
   currency: Currency;
+  printArea: PrintArea | null;
 };
 
 export type ProductImageView = {
@@ -47,7 +53,7 @@ export async function getProductBySlug(
       `id, slug, is_bestseller,
        product_translations!inner ( name, description, seo_title, seo_desc ),
        product_images ( url, alt, position ),
-       product_variants ( id, sku, size, color, weight_grams ),
+       product_variants ( id, sku, size, color, weight_grams, print_area_width_px, print_area_height_px, print_area_dpi ),
        product_categories (
          categories ( slug, category_translations ( name, locale ) )
        )`
@@ -58,6 +64,21 @@ export async function getProductBySlug(
     .maybeSingle();
 
   if (!product) return null;
+
+  function getPrintArea(variant: {
+    print_area_width_px: number | null;
+    print_area_height_px: number | null;
+    print_area_dpi: number | null;
+  }): PrintArea | null {
+    if (!variant.print_area_width_px || !variant.print_area_height_px || !variant.print_area_dpi) {
+      return null;
+    }
+    return {
+      widthPx: variant.print_area_width_px,
+      heightPx: variant.print_area_height_px,
+      dpi: variant.print_area_dpi,
+    };
+  }
 
   const translation = product.product_translations[0];
   const firstCategoryLink = product.product_categories[0];
@@ -82,6 +103,7 @@ export async function getProductBySlug(
             weightGrams: variant.weight_grams,
             priceCents: displayPrice?.amountCents ?? 0,
             currency,
+            printArea: getPrintArea(variant),
           };
         })
       )
@@ -93,6 +115,7 @@ export async function getProductBySlug(
         weightGrams: variant.weight_grams,
         priceCents: 0,
         currency,
+        printArea: getPrintArea(variant),
       }));
 
   return {

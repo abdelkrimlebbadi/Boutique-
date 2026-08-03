@@ -51,12 +51,19 @@ export async function handlePaymentSucceeded(
   try {
     const { data: items } = await supabase
       .from("order_items")
-      .select("printful_variant_id, quantity, unit_price_cents, name")
+      .select("printful_variant_id, quantity, unit_price_cents, name, custom_design_url")
       .eq("order_id", order.id);
 
     const shippingAddress = addressSchema.parse(order.shipping_address);
     const missingVariant = items?.find((item) => !item.printful_variant_id);
-    if (missingVariant) {
+    if (order.flagged_by_admin) {
+      // An admin flagged this order for review while it was still pending
+      // (see /admin/orders moderation panel) — never send it to Printful
+      // until the flag is cleared and the order is manually re-processed.
+      console.error(
+        `handlePaymentSucceeded: order ${order.id} is flagged_by_admin, skipping Printful order creation`
+      );
+    } else if (missingVariant) {
       console.error(
         `handlePaymentSucceeded: order ${order.id} has a line item with no printful_variant_id (${missingVariant.name}), skipping Printful order creation`
       );
@@ -70,6 +77,7 @@ export async function handlePaymentSucceeded(
           quantity: item.quantity,
           retailPriceCents: item.unit_price_cents,
           currency: order.currency,
+          printFileUrl: item.custom_design_url,
         })),
       });
 

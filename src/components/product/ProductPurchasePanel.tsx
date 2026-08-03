@@ -4,6 +4,7 @@ import { useState } from "react";
 import { VariantSelector } from "./VariantSelector";
 import { ShippingEstimate } from "./ShippingEstimate";
 import { SizeGuide } from "./SizeGuide";
+import { ProductCustomizer } from "./customize/ProductCustomizer";
 import type { ProductVariantView } from "@/lib/catalog/get-product-by-slug";
 
 export function ProductPurchasePanel({
@@ -32,6 +33,20 @@ export function ProductPurchasePanel({
         onVariantChange={setSelectedVariant}
       />
       {hasSizes && <SizeGuide />}
+      {selectedVariant?.printArea && (
+        <ProductCustomizer
+          key={selectedVariant.id}
+          printArea={selectedVariant.printArea}
+          variantId={selectedVariant.id}
+          sku={selectedVariant.sku}
+          size={selectedVariant.size}
+          color={selectedVariant.color}
+          priceCents={selectedVariant.priceCents}
+          productSlug={productSlug}
+          productName={productName}
+          fallbackImageUrl={imageUrl}
+        />
+      )}
       <ShippingEstimate weightGrams={selectedVariant?.weightGrams ?? null} />
     </div>
   );

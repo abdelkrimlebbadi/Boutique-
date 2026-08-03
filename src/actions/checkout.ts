@@ -251,7 +251,7 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
 
   const { data: cartItemRows } = await supabase
     .from("cart_items")
-    .select("variant_id, quantity")
+    .select("variant_id, quantity, custom_design_state, custom_design_print_file_url")
     .eq("cart_id", cartId);
   if (!cartItemRows || cartItemRows.length === 0) redirect(`/${locale}/checkout`);
 
@@ -274,7 +274,12 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
   const discountCode = await getCheckoutDiscountCode();
 
   const pricing = await computeOrderPricing({
-    cartItems: cartItemRows.map((row) => ({ variantId: row.variant_id, quantity: row.quantity })),
+    cartItems: cartItemRows.map((row) => ({
+      variantId: row.variant_id,
+      quantity: row.quantity,
+      hasCustomDesign: row.custom_design_state !== null,
+      customDesignPrintFileUrl: row.custom_design_print_file_url,
+    })),
     currency,
     countryCode: shippingAddressRow.country_code,
     locale: locale as Locale,
@@ -318,6 +323,7 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
         unit_price_cents: item.unitPriceCents,
         quantity: item.quantity,
         line_total_cents: item.lineTotalCents,
+        custom_design_url: item.customDesignPrintFileUrl,
       })),
     }
   );
