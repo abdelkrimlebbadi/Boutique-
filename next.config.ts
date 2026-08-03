@@ -4,6 +4,16 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Next.js defaults Server Actions to a 1MB request body — well under
+    // our own 10MB upload limit (src/lib/uploads/sniff-image.ts). A real
+    // phone photo (2-10MB) would otherwise be silently rejected by the
+    // framework before uploadDesignImage/finalizeCartItemDesign ever run,
+    // surfacing as an uncaught error instead of our validation messages.
+    serverActions: {
+      bodySizeLimit: "12mb",
+    },
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

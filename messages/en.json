@@ -59,6 +59,7 @@
       "uploadHint": "JPG or PNG, 10 MB max",
       "uploading": "Uploading...",
       "uploadError": "Invalid image file (JPG or PNG required)",
+      "uploadFailed": "Upload failed. Check your connection and try again.",
       "uploadTooLarge": "File too large (10 MB max)",
       "rightsCheckbox": "I confirm I own the rights to this image",
       "rightsRequired": "Please confirm you own the rights to this image.",
