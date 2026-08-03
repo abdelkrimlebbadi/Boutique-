@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { redirect, unstable_rethrow } from "next/navigation";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { resolveActiveCartId } from "@/lib/cart/resolve-cart-id";
@@ -322,56 +322,41 @@ const simulateMockPaymentSchema = z.object({
   locale: localeSchema,
 });
 
-// Temporary: returns the underlying failure instead of throwing, so the
-// real message reaches the browser — Next.js replaces thrown Server Action
-// errors with an opaque digest in production, which makes a live failure
-// undiagnosable. Revert to throwing once resolved.
 export async function simulateMockPayment(
   rawInput: z.input<typeof simulateMockPaymentSchema>
-): Promise<{ error: string } | void> {
-  let confirmationUrl: string;
-  try {
-    if (process.env.PAYMENT_PROVIDER !== "mock") {
-      throw new Error("Mock payment simulation is disabled (PAYMENT_PROVIDER != mock)");
-    }
-    const input = simulateMockPaymentSchema.parse(rawInput);
-    const secret = process.env.MOCK_WEBHOOK_SECRET;
-    if (!secret) throw new Error("MOCK_WEBHOOK_SECRET not configured");
+): Promise<void> {
+  if (process.env.PAYMENT_PROVIDER !== "mock") {
+    throw new Error("Mock payment simulation is disabled (PAYMENT_PROVIDER != mock)");
+  }
+  const input = simulateMockPaymentSchema.parse(rawInput);
+  const secret = process.env.MOCK_WEBHOOK_SECRET;
+  if (!secret) throw new Error("MOCK_WEBHOOK_SECRET not configured");
 
-    const { createHmac } = await import("node:crypto");
-    const payload = JSON.stringify({
-      orderId: input.orderId,
-      externalId: input.externalId,
-      outcome: input.outcome,
-      amountCents: input.amountCents,
-      currency: input.currency,
-    });
-    const signature = createHmac("sha256", secret).update(payload).digest("hex");
+  const { createHmac } = await import("node:crypto");
+  const payload = JSON.stringify({
+    orderId: input.orderId,
+    externalId: input.externalId,
+    outcome: input.outcome,
+    amountCents: input.amountCents,
+    currency: input.currency,
+  });
+  const signature = createHmac("sha256", secret).update(payload).digest("hex");
 
-    // Called in-process rather than POSTed to /api/webhooks/mock: a Worker
-    // cannot fetch its own hostname (Cloudflare error 1042). The payload is
-    // still signed and goes through the same verification, idempotence and
-    // processing path a real provider's webhook takes.
-    const result = await processPaymentWebhook({
-      rawBody: payload,
-      headers: new Headers({
-        "content-type": "application/json",
-        "x-mock-signature": signature,
-      }),
-      providerName: "mock",
-    });
-    if (!result.ok) {
-      throw new Error(`Mock webhook processing failed: ${result.status} ${result.error}`);
-    }
-
-    confirmationUrl = `/${input.locale}/checkout/confirmation?order=${input.orderId}`;
-  } catch (caughtError) {
-    unstable_rethrow(caughtError);
-    const message =
-      caughtError instanceof Error ? caughtError.message : String(caughtError);
-    console.error("simulateMockPayment failed:", caughtError);
-    return { error: message };
+  // Called in-process rather than POSTed to /api/webhooks/mock: a Worker
+  // cannot fetch its own hostname (Cloudflare error 1042). The payload is
+  // still signed and goes through the same verification, idempotence and
+  // processing path a real provider's webhook takes.
+  const result = await processPaymentWebhook({
+    rawBody: payload,
+    headers: new Headers({
+      "content-type": "application/json",
+      "x-mock-signature": signature,
+    }),
+    providerName: "mock",
+  });
+  if (!result.ok) {
+    throw new Error(`Mock webhook processing failed: ${result.status} ${result.error}`);
   }
 
-  redirect(confirmationUrl);
+  redirect(`/${input.locale}/checkout/confirmation?order=${input.orderId}`);
 }
