@@ -10,6 +10,7 @@ import {
 } from "react";
 import { addToCart as addToCartAction } from "@/actions/cart";
 import type { CartItemView, CartView } from "@/lib/cart/types";
+import type { DesignState } from "@/lib/customize/types";
 
 export type AddToCartInput = {
   variantId: string;
@@ -20,6 +21,7 @@ export type AddToCartInput = {
   productName: string;
   imageUrl: string | null;
   priceCents: number;
+  customDesign?: { imageUrl: string | null; state: DesignState };
 };
 
 type CartContextValue = {
@@ -38,11 +40,19 @@ function applyOptimisticAdd(
   input: AddToCartInput,
   quantity: number
 ): CartView {
-  const existing = state.items.find((item) => item.variantId === input.variantId);
+  // A customized line is never merged into an existing row — each
+  // personalization is its own line (see the partial unique index in
+  // 20260728140200_cart_item_customization.sql, which only dedups plain,
+  // non-customized rows).
+  const existing = input.customDesign
+    ? undefined
+    : state.items.find(
+        (item) => item.variantId === input.variantId && !item.customDesignImageUrl
+      );
 
   const items: CartItemView[] = existing
     ? state.items.map((item) =>
-        item.variantId === input.variantId
+        item.id === existing.id
           ? {
               ...item,
               quantity: item.quantity + quantity,
@@ -53,7 +63,7 @@ function applyOptimisticAdd(
     : [
         ...state.items,
         {
-          id: `optimistic-${input.variantId}`,
+          id: `optimistic-${input.variantId}-${Date.now()}`,
           variantId: input.variantId,
           quantity,
           sku: input.sku,
@@ -65,6 +75,7 @@ function applyOptimisticAdd(
           imageAlt: input.productName,
           unitPriceCents: input.priceCents,
           lineTotalCents: input.priceCents * quantity,
+          customDesignImageUrl: input.customDesign?.imageUrl ?? null,
         },
       ];
 
@@ -95,7 +106,12 @@ export function CartProvider({
     setIsOpen(true);
     startTransition(async () => {
       setOptimisticCart({ input, quantity });
-      await addToCartAction({ variantId: input.variantId, quantity });
+      await addToCartAction({
+        variantId: input.variantId,
+        quantity,
+        customDesignImageUrl: input.customDesign?.imageUrl ?? null,
+        customDesignState: input.customDesign?.state,
+      });
     });
   }
 

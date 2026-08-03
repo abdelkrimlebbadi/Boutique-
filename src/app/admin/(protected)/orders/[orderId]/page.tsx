@@ -5,6 +5,7 @@ import { StatusChip } from "@/components/admin/ui/StatusChip";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@/components/admin/ui/Table";
 import { RefundForm } from "@/components/admin/orders/RefundForm";
 import { PrintfulStatusPanel } from "@/components/admin/orders/PrintfulStatusPanel";
+import { FlagOrderToggle } from "@/components/admin/orders/FlagOrderToggle";
 
 const NEGATIVE_STATUSES = new Set(["cancelled", "refunded", "failed"]);
 const REFUNDABLE_STATUSES = new Set(["paid", "processing", "shipped", "delivered"]);
@@ -82,6 +83,19 @@ export default async function AdminOrderDetailPage({
                   <Td>
                     {item.name}
                     {item.variant_label ? ` — ${item.variant_label}` : ""}
+                    {item.custom_design_url && (
+                      <>
+                        {" — "}
+                        <a
+                          href={item.custom_design_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          Visuel personnalisé
+                        </a>
+                      </>
+                    )}
                   </Td>
                   <Td align="right">{item.quantity}</Td>
                   <Td align="right">{formatCents(item.line_total_cents, order.currency)}</Td>
@@ -127,6 +141,16 @@ export default async function AdminOrderDetailPage({
         </div>
 
         <div className="flex flex-col gap-6">
+          {items.some((item) => item.custom_design_url) && (
+            <div className="border border-black p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="font-display text-base font-semibold">Modération</h2>
+                {order.flagged_by_admin && <StatusChip negative>signalée</StatusChip>}
+              </div>
+              <FlagOrderToggle orderId={order.id} initialFlagged={order.flagged_by_admin} />
+            </div>
+          )}
+
           <div className="border border-black p-4 text-sm">
             <h2 className="mb-2 font-display text-base font-semibold">Paiement</h2>
             <p>Prestataire : {order.payment_provider}</p>

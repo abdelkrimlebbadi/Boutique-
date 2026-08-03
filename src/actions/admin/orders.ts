@@ -50,6 +50,35 @@ export async function refundOrder(
   return { ok: true };
 }
 
+const toggleOrderFlagSchema = z.object({
+  orderId: z.string().uuid(),
+  flagged: z.boolean(),
+});
+
+// Same calque as refundOrder: single-table write, no RPC needed. The real
+// enforcement of the flag (skipping Printful order creation) lives in
+// handlePaymentSucceeded — this action only ever needs to be effective
+// while the order is still pending, since that's the only window before
+// Printful submission happens (see the migration's comment for why).
+export async function toggleOrderFlag(
+  rawInput: z.input<typeof toggleOrderFlagSchema>
+): Promise<{ error: string } | { ok: true }> {
+  await requireAdmin();
+  const { orderId, flagged } = toggleOrderFlagSchema.parse(rawInput);
+
+  const serviceRole = createServiceRoleClient();
+  const { error } = await serviceRole
+    .from("orders")
+    .update({ flagged_by_admin: flagged })
+    .eq("id", orderId);
+  if (error) {
+    console.error(`toggleOrderFlag failed for ${orderId}:`, error);
+    return { error: "Impossible de mettre à jour le statut de modération." };
+  }
+
+  return { ok: true };
+}
+
 const refreshPrintfulOrderStatusSchema = z.object({ printfulOrderId: z.string().min(1) });
 
 export async function refreshPrintfulOrderStatus(

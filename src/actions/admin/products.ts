@@ -25,6 +25,9 @@ const variantSchema = z
     printfulVariantId: z.string().trim().max(64).nullable(),
     stockPolicy: z.enum(["made_to_order", "in_stock", "out_of_stock"]),
     weightGrams: z.number().int().positive().nullable(),
+    printAreaWidthPx: z.number().int().positive().nullable(),
+    printAreaHeightPx: z.number().int().positive().nullable(),
+    printAreaDpi: z.number().int().positive().nullable(),
     prices: z.array(priceSchema).min(1),
   })
   .superRefine((variant, ctx) => {
@@ -108,6 +111,9 @@ async function callAdminSaveProduct(input: z.infer<typeof saveProductSchema>): P
       printful_variant_id: v.printfulVariantId,
       stock_policy: v.stockPolicy,
       weight_grams: v.weightGrams,
+      print_area_width_px: v.printAreaWidthPx,
+      print_area_height_px: v.printAreaHeightPx,
+      print_area_dpi: v.printAreaDpi,
       prices: v.prices.map((p) => ({
         currency: p.currency,
         amount_cents: p.amountCents,
@@ -234,6 +240,9 @@ export async function importPrintfulProduct(
         printfulVariantId: null,
         stockPolicy: "made_to_order",
         weightGrams: null,
+        printAreaWidthPx: null,
+        printAreaHeightPx: null,
+        printAreaDpi: null,
         prices: [
           {
             currency: "USD",

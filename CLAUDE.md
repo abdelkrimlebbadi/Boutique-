@@ -66,11 +66,14 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 │   │   └── api/
 │   │       └── webhooks/[provider]/route.ts   # Paiement + Printful
 │   ├── components/          # Composants UI partagés (boutique)
-│   │   ├── checkout/        # CheckoutSteps, CheckoutAddressForm, DiscountCodeForm, OrderSummary, ...
+│   │   ├── checkout/        # CheckoutSteps, CheckoutAddressForm, DiscountCodeForm, OrderSummary,
+│   │   │                      DesignCompositor, PaymentSection, ...
+│   │   ├── product/customize/ # ProductCustomizer (canvas Konva), DesignUploadField, TextLayerControls
 │   │   └── admin/            # Système de design admin séparé (noir/blanc, contours uniquement)
 │   ├── actions/              # Server Actions (mutations)
 │   │   ├── checkout.ts       # saveCheckoutAddress, applyDiscountCode, startPayment, ...
-│   │   └── admin/             # auth, orders (remboursement), products, discounts
+│   │   ├── customize.ts      # uploadDesignImage, finalizeCartItemDesign
+│   │   └── admin/             # auth, orders (remboursement/modération), products, discounts
 │   ├── lib/
 │   │   ├── supabase/         # Clients Supabase (anon + service_role)
 │   │   ├── payments/          # Couche d'abstraction PaymentProvider (types, sélection, Mock)
@@ -80,6 +83,9 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 │   │   ├── resend/            # Emails transactionnels (client, envois, templates React Email)
 │   │   ├── checkout/          # Tunnel : pricing serveur, cookies d'état, orchestration webhooks
 │   │   ├── admin/             # Auth admin, métriques dashboard, requêtes commandes/produits/clients, CSV
+│   │   ├── customize/         # Types DesignState partagés (client + serveur)
+│   │   ├── uploads/           # sniff-image.ts — validation upload par octets magiques
+│   │   ├── fonts/             # Polices auto-hébergées de l'outil de personnalisation
 │   │   └── validation/        # Schémas zod partagés
 │   └── types/                # Types partagés
 ├── public/
@@ -92,6 +98,17 @@ Plateforme e-commerce internationale en print-on-demand (POD), opérée depuis l
 - Le total d'une commande est recalculé intégralement côté serveur (`src/lib/checkout/compute-order-pricing.ts`) avant toute création de commande ou paiement — jamais de confiance dans un montant venu du client.
 - `orders` est créée `pending` avant redirection vers le provider, via la fonction Postgres atomique `create_order_with_items` (service_role uniquement, `EXECUTE` révoqué pour `anon`/`authenticated`).
 - Webhooks (`/api/webhooks/[provider]`, paiement + Printful) : idempotents via `claim_webhook_event` (RPC service_role, révoquée pour `anon`/`authenticated`), clé `(provider, external_id)`.
+
+## Personnalisation produit (upload image + texte)
+
+- Disponible sur les fiches produits dont la variante sélectionnée a une zone d'impression configurée (`product_variants.print_area_width_px/height_px/dpi`, saisie manuelle par l'admin dans `VariantsEditor` — jamais d'appel live à l'API Printful catalog sur le parcours d'achat public, jamais de valeur par défaut inventée si l'un des trois champs est absent).
+- **Fusion image+texte obligatoirement côté client (navigateur), jamais côté serveur.** Cloudflare Workers (plateforme de déploiement) ne supporte aucun binding natif de traitement d'image (pas de `node-canvas`, pas de `sharp`) ; combiné à la règle « zéro service payant », le canvas Konva déjà utilisé pour l'aperçu est aussi ce qui produit le fichier d'impression final — ce n'est pas un choix parmi d'autres.
+- **Système de coordonnées pixel-exact** : le `<Stage>` Konva est créé à la taille exacte de la zone d'impression (`print_area_width_px` × `print_area_height_px`) ; le zoom d'affichage à l'écran est purement du CSS (le conteneur du stage est redimensionné en CSS, jamais le stage lui-même), jamais une deuxième unité de coordonnées. `cart_items.custom_design_state` (jsonb) stocke donc des positions déjà dans l'espace pixel d'impression final — exporter le stage à sa taille native donne directement le fichier prêt à imprimer, sans conversion DPI a posteriori.
+- **Chronologie de la fusion** : l'upload brut + le positionnement (`ProductCustomizer`, sur la fiche produit) n'écrivent que `custom_design_image_url`/`custom_design_state` sur la ligne de panier. La fusion en fichier d'impression (`DesignCompositor`, monté sur `/checkout/payment`) ne se déclenche que juste avant le paiement, jamais avant — un panier abandonné ne déclenche donc jamais de traitement, même si le rendu lui-même (dans le navigateur) est gratuit. Le bouton « Payer » (`PaymentSection`) reste désactivé tant que `custom_design_print_file_url` n'est pas renseigné pour chaque ligne personnalisée ; `compute-order-pricing.ts` revérifie côté serveur (erreur `MISSING_DESIGN`) avant toute création de commande — jamais de confiance dans l'état du client seul.
+- Bucket Supabase Storage dédié `custom-designs` (public en lecture, écriture `service_role` uniquement) — distinct de `product-images`, car lié au panier et non au produit.
+- Validation upload : `src/lib/uploads/sniff-image.ts`, octets magiques + dimensions réelles lues depuis l'en-tête du fichier (jamais `file.type`/l'extension, falsifiables). JPG/PNG uniquement, 10 Mo max.
+- Nettoyage : `cleanup_stale_custom_designs()` (pg_cron, même pattern que `cleanup_stale_anonymous_users`) supprime après 30 jours tout design jamais rattaché à une commande payée.
+- Modération admin : `orders.flagged_by_admin` (panneau « Modération » sur `/admin/orders/[orderId]`, visible seulement si la commande contient un item personnalisé). Fenêtre utile : entre la création de la commande `pending` et le webhook de paiement réussi (qui déclenche l'envoi Printful) — `handlePaymentSucceeded` saute l'envoi Printful si le flag est actif.
 
 ## Administration (`/admin`)
 

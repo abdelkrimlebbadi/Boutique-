@@ -51,7 +51,30 @@
     "shippingEstimateUnavailable": "Estimation indisponible pour ce pays.",
     "outOfStock": "Indisponible",
     "bestseller": "Best-seller",
-    "from": "à partir de"
+    "from": "à partir de",
+    "customize": {
+      "openButton": "Personnaliser ce produit",
+      "closeButton": "Fermer la personnalisation",
+      "uploadLabel": "Ajouter une image",
+      "uploadHint": "JPG ou PNG, 10 Mo maximum",
+      "uploading": "Envoi en cours...",
+      "uploadError": "Fichier image invalide (JPG ou PNG requis)",
+      "uploadTooLarge": "Fichier trop volumineux (10 Mo max)",
+      "rightsCheckbox": "Je confirme détenir les droits sur cette image",
+      "rightsRequired": "Merci de confirmer que vous détenez les droits sur cette image.",
+      "textPlaceholder": "Votre texte",
+      "fontLabel": "Police",
+      "colorLabel": "Couleur",
+      "sizeLabel": "Taille du texte",
+      "removeImage": "Supprimer l'image",
+      "removeText": "Supprimer le texte",
+      "addCustomToCart": "Ajouter le design au panier",
+      "emptyDesign": "Ajoutez une image ou du texte pour continuer.",
+      "font_sans": "Sans-serif",
+      "font_serif": "Serif",
+      "font_mono": "Monospace",
+      "font_script": "Manuscrite"
+    }
   },
   "catalog": {
     "filtersTitle": "Filtres",
@@ -129,7 +152,11 @@
       "errorNoShipping": "Aucun tarif de livraison disponible pour cette adresse.",
       "errorInvalidDiscount": "Ce code promo n'est plus valide.",
       "errorOrderCreation": "Impossible de créer la commande. Veuillez réessayer.",
-      "errorPaymentSession": "Impossible d'initier le paiement. Veuillez réessayer."
+      "errorPaymentSession": "Impossible d'initier le paiement. Veuillez réessayer.",
+      "preparingDesigns": "Préparation de votre visuel personnalisé...",
+      "designPreparationError": "Échec de la préparation d'un visuel personnalisé.",
+      "designPreparationRetry": "Réessayer",
+      "errorMissingDesign": "Un visuel personnalisé n'a pas pu être préparé. Veuillez réessayer."
     },
     "mockPay": {
       "title": "Paiement de démonstration",

@@ -93,6 +93,9 @@ export type Database = {
         Row: {
           cart_id: string
           created_at: string
+          custom_design_image_url: string | null
+          custom_design_print_file_url: string | null
+          custom_design_state: Json | null
           id: string
           quantity: number
           updated_at: string
@@ -101,6 +104,9 @@ export type Database = {
         Insert: {
           cart_id: string
           created_at?: string
+          custom_design_image_url?: string | null
+          custom_design_print_file_url?: string | null
+          custom_design_state?: Json | null
           id?: string
           quantity: number
           updated_at?: string
@@ -109,6 +115,9 @@ export type Database = {
         Update: {
           cart_id?: string
           created_at?: string
+          custom_design_image_url?: string | null
+          custom_design_print_file_url?: string | null
+          custom_design_state?: Json | null
           id?: string
           quantity?: number
           updated_at?: string
@@ -335,6 +344,7 @@ export type Database = {
       order_items: {
         Row: {
           created_at: string
+          custom_design_url: string | null
           customer_id: string
           id: string
           image_url: string | null
@@ -351,6 +361,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_design_url?: string | null
           customer_id: string
           id?: string
           image_url?: string | null
@@ -367,6 +378,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_design_url?: string | null
           customer_id?: string
           id?: string
           image_url?: string | null
@@ -423,6 +435,7 @@ export type Database = {
           customer_id: string
           discount_cents: number
           discount_code_id: string | null
+          flagged_by_admin: boolean
           id: string
           order_number: string
           payment_provider: Database["public"]["Enums"]["payment_provider"]
@@ -450,6 +463,7 @@ export type Database = {
           customer_id: string
           discount_cents?: number
           discount_code_id?: string | null
+          flagged_by_admin?: boolean
           id?: string
           order_number: string
           payment_provider: Database["public"]["Enums"]["payment_provider"]
@@ -477,6 +491,7 @@ export type Database = {
           customer_id?: string
           discount_cents?: number
           discount_code_id?: string | null
+          flagged_by_admin?: boolean
           id?: string
           order_number?: string
           payment_provider?: Database["public"]["Enums"]["payment_provider"]
@@ -678,6 +693,9 @@ export type Database = {
           color: string | null
           created_at: string
           id: string
+          print_area_dpi: number | null
+          print_area_height_px: number | null
+          print_area_width_px: number | null
           printful_variant_id: string | null
           product_id: string
           size: string | null
@@ -690,6 +708,9 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          print_area_dpi?: number | null
+          print_area_height_px?: number | null
+          print_area_width_px?: number | null
           printful_variant_id?: string | null
           product_id: string
           size?: string | null
@@ -702,6 +723,9 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          print_area_dpi?: number | null
+          print_area_height_px?: number | null
+          print_area_width_px?: number | null
           printful_variant_id?: string | null
           product_id?: string
           size?: string | null
@@ -987,6 +1011,7 @@ export type Database = {
         Returns: string
       }
       cleanup_stale_anonymous_users: { Args: never; Returns: undefined }
+      cleanup_stale_custom_designs: { Args: never; Returns: undefined }
       create_order_with_items: {
         Args: {
           p_billing_address: Json
@@ -1015,6 +1040,7 @@ export type Database = {
           customer_id: string
           discount_cents: number
           discount_code_id: string | null
+          flagged_by_admin: boolean
           id: string
           order_number: string
           payment_provider: Database["public"]["Enums"]["payment_provider"]

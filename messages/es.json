@@ -51,7 +51,30 @@
     "shippingEstimateUnavailable": "Estimación no disponible para este país.",
     "outOfStock": "Agotado",
     "bestseller": "Más vendido",
-    "from": "desde"
+    "from": "desde",
+    "customize": {
+      "openButton": "Personalizar este producto",
+      "closeButton": "Cerrar personalización",
+      "uploadLabel": "Añadir una imagen",
+      "uploadHint": "JPG o PNG, 10 MB máximo",
+      "uploading": "Subiendo...",
+      "uploadError": "Archivo de imagen no válido (se requiere JPG o PNG)",
+      "uploadTooLarge": "Archivo demasiado grande (10 MB máximo)",
+      "rightsCheckbox": "Confirmo que tengo los derechos de esta imagen",
+      "rightsRequired": "Confirma que tienes los derechos de esta imagen.",
+      "textPlaceholder": "Tu texto",
+      "fontLabel": "Fuente",
+      "colorLabel": "Color",
+      "sizeLabel": "Tamaño del texto",
+      "removeImage": "Eliminar imagen",
+      "removeText": "Eliminar texto",
+      "addCustomToCart": "Añadir diseño al carrito",
+      "emptyDesign": "Añade una imagen o texto para continuar.",
+      "font_sans": "Sans-serif",
+      "font_serif": "Serif",
+      "font_mono": "Monoespaciada",
+      "font_script": "Manuscrita"
+    }
   },
   "catalog": {
     "filtersTitle": "Filtros",
@@ -129,7 +152,11 @@
       "errorNoShipping": "No hay tarifa de envío disponible para esta dirección.",
       "errorInvalidDiscount": "Este código de descuento ya no es válido.",
       "errorOrderCreation": "No se pudo crear el pedido. Inténtalo de nuevo.",
-      "errorPaymentSession": "No se pudo iniciar el pago. Inténtalo de nuevo."
+      "errorPaymentSession": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+      "preparingDesigns": "Preparando tu diseño personalizado...",
+      "designPreparationError": "No se pudo preparar un diseño personalizado.",
+      "designPreparationRetry": "Reintentar",
+      "errorMissingDesign": "No se pudo preparar un diseño personalizado. Inténtalo de nuevo."
     },
     "mockPay": {
       "title": "Pago de demostración",

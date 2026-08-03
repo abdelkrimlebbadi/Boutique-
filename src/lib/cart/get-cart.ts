@@ -31,7 +31,7 @@ async function loadCart(
 
   const { data: cartItems } = await supabase
     .from("cart_items")
-    .select("id, variant_id, quantity")
+    .select("id, variant_id, quantity, custom_design_image_url")
     .eq("cart_id", cartId);
 
   if (!cartItems || cartItems.length === 0) return EMPTY_CART(currency);
@@ -87,10 +87,11 @@ async function loadCart(
       color: variant.color,
       productSlug: product.slug,
       productName: name,
-      imageUrl: image?.url ?? null,
+      imageUrl: cartItem.custom_design_image_url ?? image?.url ?? null,
       imageAlt: image?.alt ?? null,
       unitPriceCents,
       lineTotalCents,
+      customDesignImageUrl: cartItem.custom_design_image_url,
     });
   }
 

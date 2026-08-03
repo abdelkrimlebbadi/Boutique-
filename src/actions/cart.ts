@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveActiveCartId } from "@/lib/cart/resolve-cart-id";
 import { CART_ID_COOKIE_NAME } from "@/lib/cart/constants";
+import { designStateSchema, type DesignState } from "@/lib/validation/custom-design";
 
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
@@ -41,18 +42,43 @@ async function getOrCreateActiveCartId(
 const addToCartSchema = z.object({
   variantId: z.string().uuid(),
   quantity: z.number().int().min(1).max(20),
+  customDesignImageUrl: z.string().url().nullable().optional(),
+  customDesignState: designStateSchema.optional(),
 });
 
-export async function addToCart(input: { variantId: string; quantity: number }) {
-  const { variantId, quantity } = addToCartSchema.parse(input);
+export async function addToCart(input: {
+  variantId: string;
+  quantity: number;
+  customDesignImageUrl?: string | null;
+  customDesignState?: DesignState;
+}) {
+  const { variantId, quantity, customDesignImageUrl, customDesignState } =
+    addToCartSchema.parse(input);
   const supabase = await createClient();
   const cartId = await getOrCreateActiveCartId(supabase);
+
+  // A customized line always inserts a new row — the partial unique index
+  // (cart_items_variant_unique) only dedups plain, non-customized rows, so
+  // merging quantity into an existing line here would be wrong.
+  if (customDesignState) {
+    const { error } = await supabase.from("cart_items").insert({
+      cart_id: cartId,
+      variant_id: variantId,
+      quantity,
+      custom_design_image_url: customDesignImageUrl ?? null,
+      custom_design_state: customDesignState,
+    });
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    return;
+  }
 
   const { data: existing } = await supabase
     .from("cart_items")
     .select("id, quantity")
     .eq("cart_id", cartId)
     .eq("variant_id", variantId)
+    .is("custom_design_image_url", null)
     .maybeSingle();
 
   if (existing) {

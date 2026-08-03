@@ -51,7 +51,30 @@
     "shippingEstimateUnavailable": "Estimate unavailable for this country.",
     "outOfStock": "Out of stock",
     "bestseller": "Bestseller",
-    "from": "from"
+    "from": "from",
+    "customize": {
+      "openButton": "Personalize this product",
+      "closeButton": "Close customization",
+      "uploadLabel": "Add an image",
+      "uploadHint": "JPG or PNG, 10 MB max",
+      "uploading": "Uploading...",
+      "uploadError": "Invalid image file (JPG or PNG required)",
+      "uploadTooLarge": "File too large (10 MB max)",
+      "rightsCheckbox": "I confirm I own the rights to this image",
+      "rightsRequired": "Please confirm you own the rights to this image.",
+      "textPlaceholder": "Your text",
+      "fontLabel": "Font",
+      "colorLabel": "Color",
+      "sizeLabel": "Text size",
+      "removeImage": "Remove image",
+      "removeText": "Remove text",
+      "addCustomToCart": "Add design to cart",
+      "emptyDesign": "Add an image or text to continue.",
+      "font_sans": "Sans-serif",
+      "font_serif": "Serif",
+      "font_mono": "Monospace",
+      "font_script": "Script"
+    }
   },
   "catalog": {
     "filtersTitle": "Filters",
@@ -129,7 +152,11 @@
       "errorNoShipping": "No shipping rate is available for this address.",
       "errorInvalidDiscount": "This discount code is no longer valid.",
       "errorOrderCreation": "Couldn't create the order. Please try again.",
-      "errorPaymentSession": "Couldn't start payment. Please try again."
+      "errorPaymentSession": "Couldn't start payment. Please try again.",
+      "preparingDesigns": "Preparing your custom design...",
+      "designPreparationError": "Failed to prepare a custom design.",
+      "designPreparationRetry": "Retry",
+      "errorMissingDesign": "A custom design couldn't be prepared. Please try again."
     },
     "mockPay": {
       "title": "Demo payment",
