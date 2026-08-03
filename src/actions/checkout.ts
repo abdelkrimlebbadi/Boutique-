@@ -291,10 +291,8 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
       cancelUrl: `${SITE_URL}/${locale}/checkout/payment?cancelled=1`,
     });
   } catch (error) {
-    // The order stays `pending`, orphaned — no financial impact (nothing
-    // was charged), a trade-off accepted in the plan; cleanup is future
-    // cron work, out of scope here.
     console.error("createSession failed:", error);
+    await releaseCartAfterFailedPayment(serviceRole, order.id, cartId);
     redirect(`/${locale}/checkout/payment?error=PAYMENT_SESSION_FAILED`);
   }
 
@@ -304,6 +302,40 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
   // Outside the try/catch above: redirect() throws an internal NEXT_REDIRECT
   // exception that a surrounding catch must never swallow.
   redirect(session.redirectUrl);
+}
+
+// create_order_with_items already flipped the cart to `converted`, so a
+// provider that fails to open a session would otherwise strand the customer:
+// the payment page finds no active cart and bounces them to an empty one,
+// with the PAYMENT_SESSION_FAILED message never rendered and their items
+// gone. Nothing was charged, so hand the cart back and close the order.
+// Best-effort by design — the redirect must happen either way, and a
+// customer seeing the error still beats one seeing an empty cart.
+async function releaseCartAfterFailedPayment(
+  serviceRole: SupabaseClient<Database>,
+  orderId: string,
+  cartId: string
+): Promise<void> {
+  const { error: orderError } = await serviceRole
+    .from("orders")
+    .update({ status: "failed" })
+    .eq("id", orderId)
+    .eq("status", "pending");
+  if (orderError) {
+    console.error(`Failed to close order ${orderId} after payment session failure:`, orderError);
+  }
+
+  // Guarded on `converted`: if the customer already started a new cart in
+  // another tab, restoring this one would violate
+  // carts_one_active_per_customer — theirs wins, this is a no-op.
+  const { error: cartError } = await serviceRole
+    .from("carts")
+    .update({ status: "active" })
+    .eq("id", cartId)
+    .eq("status", "converted");
+  if (cartError) {
+    console.error(`Failed to restore cart ${cartId} after payment session failure:`, cartError);
+  }
 }
 
 // ---------------------------------------------------------------------------
