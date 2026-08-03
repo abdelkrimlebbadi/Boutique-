@@ -341,7 +341,13 @@ export async function startPayment(rawInput: { locale: string }): Promise<void> 
   } catch (error) {
     console.error("createSession failed:", error);
     await releaseCartAfterFailedPayment(serviceRole, order.id, cartId);
-    redirect(`/${locale}/checkout/payment?error=PAYMENT_SESSION_FAILED`);
+    // Temporary: pass the real failure through the redirect URL so it's
+    // visible on the page — Cloudflare's Worker logs proved unreliable to
+    // depend on while debugging live. Revert once resolved.
+    const message = error instanceof Error ? error.message : String(error);
+    redirect(
+      `/${locale}/checkout/payment?error=PAYMENT_SESSION_FAILED&detail=${encodeURIComponent(message)}`
+    );
   }
 
   await serviceRole.from("orders").update({ payment_ref: session.externalId }).eq("id", order.id);
