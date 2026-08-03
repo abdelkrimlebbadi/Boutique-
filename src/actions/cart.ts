@@ -43,43 +43,29 @@ const addToCartSchema = z.object({
   quantity: z.number().int().min(1).max(20),
 });
 
-// Temporary: returns the underlying failure instead of throwing, so the
-// real message reaches the browser — Next.js replaces thrown Server Action
-// errors with an opaque digest in production, which makes a live cart
-// failure undiagnosable. Revert to throwing once resolved.
-export async function addToCart(input: {
-  variantId: string;
-  quantity: number;
-}): Promise<{ error: string } | void> {
-  try {
-    const { variantId, quantity } = addToCartSchema.parse(input);
-    const supabase = await createClient();
-    const cartId = await getOrCreateActiveCartId(supabase);
+export async function addToCart(input: { variantId: string; quantity: number }) {
+  const { variantId, quantity } = addToCartSchema.parse(input);
+  const supabase = await createClient();
+  const cartId = await getOrCreateActiveCartId(supabase);
 
-    const { data: existing } = await supabase
+  const { data: existing } = await supabase
+    .from("cart_items")
+    .select("id, quantity")
+    .eq("cart_id", cartId)
+    .eq("variant_id", variantId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
       .from("cart_items")
-      .select("id, quantity")
-      .eq("cart_id", cartId)
-      .eq("variant_id", variantId)
-      .maybeSingle();
-
-    if (existing) {
-      const { error } = await supabase
-        .from("cart_items")
-        .update({ quantity: existing.quantity + quantity })
-        .eq("id", existing.id);
-      if (error) throw new Error(error.message);
-    } else {
-      const { error } = await supabase
-        .from("cart_items")
-        .insert({ cart_id: cartId, variant_id: variantId, quantity });
-      if (error) throw new Error(error.message);
-    }
-  } catch (caughtError) {
-    const message =
-      caughtError instanceof Error ? caughtError.message : String(caughtError);
-    console.error("addToCart failed:", caughtError);
-    return { error: message };
+      .update({ quantity: existing.quantity + quantity })
+      .eq("id", existing.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase
+      .from("cart_items")
+      .insert({ cart_id: cartId, variant_id: variantId, quantity });
+    if (error) throw new Error(error.message);
   }
 
   revalidatePath("/", "layout");
