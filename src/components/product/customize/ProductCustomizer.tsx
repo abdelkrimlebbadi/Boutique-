@@ -73,14 +73,20 @@ export function ProductCustomizer({
     ensureCustomizerFontsLoaded().then(() => setFontsReady(true));
   }, [isOpen]);
 
-  useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    const container = stage.container();
+  // Callback ref, not a useEffect keyed on `isOpen`: the Stage only mounts
+  // once `fontsReady` flips true (async, after `isOpen`), so an effect
+  // depending on `[isOpen]` alone would fire while stageRef.current is
+  // still null, bail out, and never re-run — leaving Konva's container div
+  // at its native pixel size (e.g. 3600×4800) instead of scaled to 100%.
+  // A callback ref fires exactly when the Stage instance is created.
+  function attachStage(node: Konva.Stage | null) {
+    stageRef.current = node;
+    if (!node) return;
+    const container = node.container();
     container.style.width = "100%";
     container.style.height = "100%";
     container.style.touchAction = "none";
-  }, [isOpen]);
+  }
 
   useEffect(() => {
     const transformer = transformerRef.current;
@@ -227,12 +233,12 @@ export function ProductCustomizer({
       </div>
 
       <div
-        className="relative mx-auto w-full max-w-sm border border-neutral-300 bg-neutral-50"
+        className="relative mx-auto w-full max-w-sm overflow-hidden border border-neutral-300 bg-neutral-50"
         style={{ aspectRatio: `${printArea.widthPx} / ${printArea.heightPx}` }}
       >
         {fontsReady && (
           <Stage
-            ref={stageRef}
+            ref={attachStage}
             width={printArea.widthPx}
             height={printArea.heightPx}
             onMouseDown={handleStagePointerDown}
