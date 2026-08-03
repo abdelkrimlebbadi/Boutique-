@@ -1,9 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
-import { getPaymentProviderByName } from "@/lib/payments/select-provider";
-import { WebhookVerificationError } from "@/lib/payments/verify-hmac";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { handlePaymentSucceeded, handlePaymentFailed } from "@/lib/checkout/handle-payment-event";
+import { processPaymentWebhook } from "@/lib/checkout/process-payment-webhook";
 import { handlePrintfulShipmentWebhook } from "@/lib/printful/handle-shipment-webhook";
 import type { PaymentProviderName } from "@/lib/payments/types";
 
@@ -34,54 +32,14 @@ async function handlePaymentRequest(
   providerName: PaymentProviderName
 ): Promise<Response> {
   const rawBody = await req.text();
-  const provider = getPaymentProviderByName(providerName);
-
-  let event;
-  try {
-    event = await provider.verifyWebhook({ rawBody, headers: req.headers });
-  } catch (error) {
-    if (error instanceof WebhookVerificationError) {
-      console.error(`${providerName} webhook verification failed:`, error.message);
-      return NextResponse.json({ error: "invalid signature" }, { status: 401 });
-    }
-    throw error;
-  }
-
-  if (event.kind === "ignored") return NextResponse.json({ ok: true });
-
-  const supabase = createServiceRoleClient();
-  const { data: claimedId, error: claimError } = await supabase.rpc("claim_webhook_event", {
-    p_provider: providerName,
-    p_external_id: event.externalId,
-    p_payload: JSON.parse(rawBody),
+  const result = await processPaymentWebhook({
+    rawBody,
+    headers: req.headers,
+    providerName,
   });
-  if (claimError) {
-    console.error(`claim_webhook_event (${providerName}) failed:`, claimError);
-    return NextResponse.json({ error: "internal error" }, { status: 500 });
-  }
-  // null: already processed, or another attempt claimed it very recently —
-  // ack without reprocessing so the provider doesn't keep retrying.
-  if (!claimedId) return NextResponse.json({ ok: true });
 
-  try {
-    if (event.kind === "payment_succeeded") {
-      await handlePaymentSucceeded(event, providerName);
-    } else if (event.kind === "payment_failed") {
-      await handlePaymentFailed(event, providerName);
-    }
-    // refund_succeeded: no automated side effect yet — claiming the event
-    // still records it so it isn't reprocessed, reconciliation is manual.
-  } catch (error) {
-    console.error(`${providerName} webhook processing failed:`, error);
-    return NextResponse.json({ error: "processing failed" }, { status: 500 });
-  }
-
-  await supabase
-    .from("webhook_events")
-    .update({ processed_at: new Date().toISOString() })
-    .eq("id", claimedId);
-
-  return NextResponse.json({ ok: true });
+  if (result.ok) return NextResponse.json({ ok: true });
+  return NextResponse.json({ error: result.error }, { status: result.status });
 }
 
 async function handlePrintfulRequest(req: Request): Promise<Response> {

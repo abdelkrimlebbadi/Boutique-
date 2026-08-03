@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { resolveActiveCartId } from "@/lib/cart/resolve-cart-id";
 import { computeOrderPricing } from "@/lib/checkout/compute-order-pricing";
+import { processPaymentWebhook } from "@/lib/checkout/process-payment-webhook";
 import { getPreferredCurrency } from "@/lib/currency/get-preferred-currency";
 import { getPaymentProviderByName, getPaymentProviderName } from "@/lib/payments/select-provider";
 import { addressSchema, type AddressInput } from "@/lib/validation/address";
@@ -347,14 +348,20 @@ export async function simulateMockPayment(
     });
     const signature = createHmac("sha256", secret).update(payload).digest("hex");
 
-    const response = await fetch(`${SITE_URL}/api/webhooks/mock`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-mock-signature": signature },
-      body: payload,
+    // Called in-process rather than POSTed to /api/webhooks/mock: a Worker
+    // cannot fetch its own hostname (Cloudflare error 1042). The payload is
+    // still signed and goes through the same verification, idempotence and
+    // processing path a real provider's webhook takes.
+    const result = await processPaymentWebhook({
+      rawBody: payload,
+      headers: new Headers({
+        "content-type": "application/json",
+        "x-mock-signature": signature,
+      }),
+      providerName: "mock",
     });
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Mock webhook call failed: ${response.status} ${body}`);
+    if (!result.ok) {
+      throw new Error(`Mock webhook processing failed: ${result.status} ${result.error}`);
     }
 
     confirmationUrl = `/${input.locale}/checkout/confirmation?order=${input.orderId}`;
