@@ -27,10 +27,10 @@ export default async function CheckoutPaymentPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ error?: string; cancelled?: string; detail?: string }>;
+  searchParams: Promise<{ error?: string; cancelled?: string }>;
 }) {
   const { locale } = await params;
-  const { error, cancelled, detail } = await searchParams;
+  const { error, cancelled } = await searchParams;
   setRequestLocale(locale as Locale);
   const t = await getTranslations("checkout.payment");
   const tCart = await getTranslations("checkout.cart");
@@ -54,8 +54,7 @@ export default async function CheckoutPaymentPage({
       <Container className="max-w-2xl py-8 lg:py-12">
         <CheckoutSteps current="payment" />
         <h1 className="mb-6 font-display text-2xl font-semibold lg:text-3xl">{t("title")}</h1>
-        <p className="mb-2 text-sm text-red-600">{t(errorKey)}</p>
-        {detail && <p className="mb-6 text-xs text-red-400">{detail}</p>}
+        <p className="mb-6 text-sm text-red-600">{t(errorKey)}</p>
         <Link
           href="/products"
           className="text-sm underline underline-offset-2 transition-colors duration-(--duration-base) hover:text-accent-600"
@@ -97,12 +96,7 @@ export default async function CheckoutPaymentPage({
       ) : (
         <div className="flex flex-col gap-6">
           {cancelled && <p className="text-sm text-neutral-600">{t("cancelled")}</p>}
-          {errorKey && (
-            <div>
-              <p className="text-sm text-red-600">{t(errorKey)}</p>
-              {detail && <p className="text-xs text-red-400">{detail}</p>}
-            </div>
-          )}
+          {errorKey && <p className="text-sm text-red-600">{t(errorKey)}</p>}
 
           <DiscountCodeForm appliedCode={discountCode} />
           <OrderSummary pricing={pricing.pricing} currency={currency} locale={locale as Locale} />

@@ -7,8 +7,12 @@ import "server-only";
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
+// Trailing slash/whitespace on PAYPAL_API_BASE (an easy copy-paste mistake
+// in a secrets UI, and invisible once saved) would otherwise double up the
+// leading slash on every path built below and 404 against PayPal's edge.
 function getApiBase(): string {
-  return process.env.PAYPAL_API_BASE ?? "https://api-m.sandbox.paypal.com";
+  const base = process.env.PAYPAL_API_BASE ?? "https://api-m.sandbox.paypal.com";
+  return base.trim().replace(/\/+$/, "");
 }
 
 async function getAccessToken(): Promise<string> {
@@ -33,13 +37,7 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
-    // Temporary: include the exact URL/base — a 404 here almost always
-    // means PAYPAL_API_BASE has stray whitespace or a trailing slash from a
-    // copy-paste, invisible in the Dashboard's secret input. Revert once
-    // resolved.
-    throw new Error(
-      `PayPal OAuth token request failed: ${response.status} url=${JSON.stringify(url)} base=${JSON.stringify(getApiBase())}`
-    );
+    throw new Error(`PayPal OAuth token request failed: ${response.status}`);
   }
 
   const body = (await response.json()) as { access_token: string; expires_in: number };
