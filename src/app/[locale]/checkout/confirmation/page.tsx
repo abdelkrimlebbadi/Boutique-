@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { OrderStatusPoller } from "@/components/checkout/OrderStatusPoller";
+import { PaymentReturnFinalizer } from "@/components/checkout/PaymentReturnFinalizer";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/currency/format-money";
 import type { Currency } from "@/lib/currency/constants";
@@ -56,6 +57,7 @@ export default async function CheckoutConfirmationPage({
       <p className="mb-2 text-sm font-medium text-neutral-900">{t(statusKey)}</p>
       {order.status === "pending" && (
         <div className="mb-6">
+          <PaymentReturnFinalizer orderId={order.id} />
           <OrderStatusPoller orderId={order.id} />
         </div>
       )}

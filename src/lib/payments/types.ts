@@ -55,8 +55,21 @@ export type VerifyWebhookInput = {
   headers: Headers;
 };
 
+export type CaptureResult = {
+  paymentRef: string;
+  amountCents: number;
+  currency: string;
+};
+
 export interface PaymentProvider {
   createSession(input: CreateSessionInput): Promise<CreateSessionResult>;
   verifyWebhook(input: VerifyWebhookInput): Promise<VerifiedEvent>;
   refund(paymentRef: string, amountCents: number): Promise<void>;
+
+  // Optional, for providers whose redirect flow separates approval from
+  // settlement (PayPal Orders v2: the customer approving only authorises
+  // the order — money moves on an explicit capture call). Invoked when the
+  // customer lands back on the return URL. Providers where approval
+  // already settles the payment leave it undefined.
+  captureOnReturn?(externalId: string): Promise<CaptureResult | null>;
 }
