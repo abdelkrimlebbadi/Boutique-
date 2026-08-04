@@ -5,6 +5,7 @@ import Konva from "konva";
 import { useTranslations } from "next-intl";
 import { finalizeCartItemDesign } from "@/actions/customize";
 import { getCustomizerFont, ensureCustomizerFontsLoaded } from "@/lib/fonts/customizer-fonts";
+import { fitCanvasScale } from "@/lib/customize/canvas-limits";
 import type { DesignState } from "@/lib/customize/types";
 import type { PrintArea } from "@/lib/catalog/get-product-by-slug";
 
@@ -30,18 +31,29 @@ function loadHtmlImage(url: string): Promise<HTMLImageElement> {
 // Headless Konva: a Stage only needs *a* container div, not one attached to
 // the visible document — canvas rendering and export work fully detached.
 // Built with the vanilla Konva API (not react-konva/JSX) since this runs
-// once, imperatively, with no interactivity — exporting at the stage's
-// native width/height (no pixelRatio) gives print-pixel-exact output
-// directly, the same guarantee documented in the cart_items migration.
+// once, imperatively, with no interactivity.
+//
+// Two things must be pinned down or a phone silently produces nothing:
+//   - pixelRatio. Konva defaults a layer's backing bitmap to
+//     devicePixelRatio, so a 3600×4800 print area becomes 69 MP at dPR 2 and
+//     155 MP at dPR 3 — far past what a mobile browser will allocate. We
+//     want print pixels exactly, so it's forced to 1.
+//   - total area. Even at pixelRatio 1, our print areas land just over iOS
+//     Safari's canvas ceiling (3600×4800 = 17.28 MP vs ~16.78 MP), so the
+//     stage is capped by fitCanvasScale and the layer scaled to match.
+// Layer contents stay in print-pixel coordinates either way, so
+// custom_design_state needs no conversion.
 async function renderDesignToBlob(design: PendingDesign): Promise<Blob> {
   const { state, printArea } = design;
+  const fitScale = fitCanvasScale(printArea.widthPx, printArea.heightPx);
   const stage = new Konva.Stage({
     container: document.createElement("div"),
-    width: printArea.widthPx,
-    height: printArea.heightPx,
+    width: Math.floor(printArea.widthPx * fitScale),
+    height: Math.floor(printArea.heightPx * fitScale),
   });
-  const layer = new Konva.Layer();
+  const layer = new Konva.Layer({ scaleX: fitScale, scaleY: fitScale });
   stage.add(layer);
+  layer.getCanvas().setPixelRatio(1);
 
   layer.add(
     new Konva.Rect({
@@ -83,7 +95,10 @@ async function renderDesignToBlob(design: PendingDesign): Promise<Blob> {
 
   // Konva's own .d.ts types toBlob as Promise<unknown> (the JS implementation
   // returns Promise<Blob | null>) — narrow it back before returning.
-  const blob = (await stage.toBlob({ mimeType: "image/png" })) as Blob | null;
+  const blob = (await stage.toBlob({
+    mimeType: "image/png",
+    pixelRatio: 1,
+  })) as Blob | null;
   stage.destroy();
   if (!blob) throw new Error("export-failed");
   return blob;

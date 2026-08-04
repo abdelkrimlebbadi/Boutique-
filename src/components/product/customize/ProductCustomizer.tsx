@@ -16,6 +16,10 @@ import { Checkbox } from "@/components/ui/Checkbox";
 
 type SelectedLayer = "image" | "text" | null;
 
+// Screen pixels (see the Transformer below for why no scale conversion is
+// needed). Sized for a finger, not a mouse pointer.
+const TRANSFORMER_ANCHOR_SCREEN_PX = 18;
+
 function loadHtmlImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
@@ -63,10 +67,35 @@ export function ProductCustomizer({
   const [error, setError] = useState<string | null>(null);
   const [isAdding, startAdding] = useTransition();
 
+  const [displayWidth, setDisplayWidth] = useState(0);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const imageNodeRef = useRef<Konva.Image>(null);
   const textNodeRef = useRef<Konva.Text>(null);
   const transformerRef = useRef<Konva.Transformer>(null);
+
+  // The stage is built at its on-screen size and given a scale, rather than
+  // at full print-pixel size: a 3600×4800 stage means a 3600×4800 CSS-pixel
+  // canvas element (Konva sizes it from the stage), which no amount of
+  // sizing on the *container* shrinks — the canvas is a child, not the
+  // container. Clipped by the wrapper, that showed only the top-left corner
+  // of the print area, so a design centred at ~(1800, 2400) was never on
+  // screen at all. Layer coordinates below stay in print-pixel space; the
+  // stage scale is purely a view transform, so custom_design_state is
+  // unaffected.
+  useEffect(() => {
+    if (!isOpen) return;
+    const element = wrapperRef.current;
+    if (!element) return;
+    const measure = () => setDisplayWidth(element.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isOpen]);
+
+  const viewScale = displayWidth > 0 ? displayWidth / printArea.widthPx : 0;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -80,19 +109,15 @@ export function ProductCustomizer({
       .finally(() => setFontsReady(true));
   }, [isOpen]);
 
-  // Callback ref, not a useEffect keyed on `isOpen`: the Stage only mounts
-  // once `fontsReady` flips true (async, after `isOpen`), so an effect
-  // depending on `[isOpen]` alone would fire while stageRef.current is
-  // still null, bail out, and never re-run — leaving Konva's container div
-  // at its native pixel size (e.g. 3600×4800) instead of scaled to 100%.
-  // A callback ref fires exactly when the Stage instance is created.
+  // Callback ref rather than a useEffect: the Stage mounts asynchronously
+  // (only once fontsReady and displayWidth are both set), so an effect keyed
+  // on `isOpen` would fire while stageRef.current is still null and never
+  // re-run. touchAction is set here so a drag on the canvas doesn't scroll
+  // the page underneath it on mobile.
   function attachStage(node: Konva.Stage | null) {
     stageRef.current = node;
     if (!node) return;
-    const container = node.container();
-    container.style.width = "100%";
-    container.style.height = "100%";
-    container.style.touchAction = "none";
+    node.container().style.touchAction = "none";
   }
 
   useEffect(() => {
@@ -240,14 +265,17 @@ export function ProductCustomizer({
       </div>
 
       <div
+        ref={wrapperRef}
         className="relative mx-auto w-full max-w-sm overflow-hidden border border-neutral-300 bg-neutral-50"
         style={{ aspectRatio: `${printArea.widthPx} / ${printArea.heightPx}` }}
       >
-        {fontsReady && (
+        {fontsReady && viewScale > 0 && (
           <Stage
             ref={attachStage}
-            width={printArea.widthPx}
-            height={printArea.heightPx}
+            width={displayWidth}
+            height={printArea.heightPx * viewScale}
+            scaleX={viewScale}
+            scaleY={viewScale}
             onMouseDown={handleStagePointerDown}
             onTouchStart={handleStagePointerDown}
           >
@@ -300,10 +328,17 @@ export function ProductCustomizer({
                   onTransformEnd={handleTextTransformEnd}
                 />
               )}
+              {/* anchorSize is already in screen pixels and must NOT be
+                  divided by viewScale: Transformer overrides
+                  getAbsoluteTransform() to return only its own transform
+                  (konva/lib/shapes/Transformer.js), so it draws in absolute
+                  space and is unaffected by the stage scale. Bumped above
+                  Konva's 10px default purely to give a finger a real target. */}
               <Transformer
                 ref={transformerRef}
                 rotateEnabled
                 keepRatio={selectedLayer === "image"}
+                anchorSize={TRANSFORMER_ANCHOR_SCREEN_PX}
                 boundBoxFunc={(oldBox, newBox) =>
                   newBox.width < 10 || newBox.height < 10 ? oldBox : newBox
                 }
