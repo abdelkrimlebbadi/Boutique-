@@ -59,6 +59,7 @@
       "uploadHint": "JPG ou PNG, 10 Mo maximum",
       "uploading": "Envoi en cours...",
       "uploadError": "Fichier image invalide (JPG ou PNG requis)",
+      "uploadFailed": "Échec de l'envoi. Vérifie ta connexion et réessaie.",
       "uploadTooLarge": "Fichier trop volumineux (10 Mo max)",
       "rightsCheckbox": "Je confirme détenir les droits sur cette image",
       "rightsRequired": "Merci de confirmer que vous détenez les droits sur cette image.",

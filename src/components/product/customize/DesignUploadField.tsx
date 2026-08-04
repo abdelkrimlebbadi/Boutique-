@@ -42,12 +42,20 @@ export function DesignUploadField({
     formData.set("file", file);
 
     startTransition(async () => {
-      const result = await uploadDesignImage(formData);
-      if ("error" in result) {
-        setError(result.error);
-        return;
+      try {
+        const result = await uploadDesignImage(formData);
+        if ("error" in result) {
+          setError(result.error);
+          return;
+        }
+        onUploaded(result.url);
+      } catch {
+        // A thrown/rejected Server Action call (network blip, a request
+        // rejected by the framework before uploadDesignImage's own code
+        // runs, ...) must degrade to an inline message, never propagate
+        // up to the nearest error boundary and take out the whole page.
+        setError(t("uploadFailed"));
       }
-      onUploaded(result.url);
     });
   }
 
