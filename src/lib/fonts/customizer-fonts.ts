@@ -16,9 +16,13 @@ export type CustomizerFontId = "sans" | "serif" | "mono" | "script";
 export type CustomizerFont = {
   id: CustomizerFontId;
   label: string;
-  /** Real font-family string (e.g. "__Roboto_Mono_abc123") — usable both as
-   *  a CSS value and as Konva/Canvas 2D's `fontFamily`, unlike a CSS custom
-   *  property which Canvas cannot resolve. */
+  /** next/font's real font-family value — NOT a bare identifier. It's
+   *  already a full, self-quoted CSS font stack (primary + generated
+   *  fallback, e.g. `'__Work_Sans_c23dc8', '__Work_Sans_Fallback_c23dc8'`),
+   *  usable directly both as a CSS value and as Konva/Canvas 2D's
+   *  `fontFamily` (unlike a CSS custom property, which Canvas cannot
+   *  resolve) — never wrap it in an extra pair of quotes, see
+   *  ensureCustomizerFontsLoaded below for what that breaks. */
   fontFamily: string;
 };
 
@@ -41,8 +45,15 @@ export function getCustomizerFont(id: CustomizerFontId): CustomizerFont {
 // DesignCompositor — the export is the actual print file, and a silent
 // fallback there would ship a design in the wrong font undetected.
 export async function ensureCustomizerFontsLoaded(): Promise<void> {
+  // No extra quotes around font.fontFamily — it's already a valid,
+  // self-quoted, comma-separated CSS font stack. Wrapping it again turns
+  // the whole stack into one malformed "family name" (literal quotes and
+  // comma included), which desktop Chromium loads leniently (silently
+  // resolving) but Safari's stricter document.fonts rejects — leaving
+  // fontsReady permanently false and the whole canvas (image AND text,
+  // neither depends on the other) never mounting.
   await Promise.all(
-    CUSTOMIZER_FONTS.map((font) => document.fonts.load(`16px "${font.fontFamily}"`))
+    CUSTOMIZER_FONTS.map((font) => document.fonts.load(`16px ${font.fontFamily}`))
   );
   await document.fonts.ready;
 }

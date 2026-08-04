@@ -70,7 +70,14 @@ export function ProductCustomizer({
 
   useEffect(() => {
     if (!isOpen) return;
-    ensureCustomizerFontsLoaded().then(() => setFontsReady(true));
+    // The live editor is a best-effort preview, not the print file (that's
+    // DesignCompositor, which stays strict) — Canvas 2D always falls back
+    // to a system font, so a rejected font-load promise here should still
+    // let the Stage mount rather than leaving the editor permanently blank
+    // with no feedback (exactly what an unhandled rejection did before).
+    ensureCustomizerFontsLoaded()
+      .catch(() => {})
+      .finally(() => setFontsReady(true));
   }, [isOpen]);
 
   // Callback ref, not a useEffect keyed on `isOpen`: the Stage only mounts
