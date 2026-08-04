@@ -15,6 +15,50 @@ export type PendingDesign = {
   printArea: PrintArea;
 };
 
+// Comfortably under both finalizeCartItemDesign's own MAX_UPLOAD_BYTES
+// (10MB) and the Server Action body limit in next.config.ts (12MB).
+const MAX_PRINT_FILE_BYTES = 8 * 1024 * 1024;
+
+// Quality ladder for the JPEG path. 0.92 measured at ~3.3MB for a full-frame
+// phone photo at print resolution; the lower rungs only ever come into play
+// for pathological inputs.
+const JPEG_QUALITY_STEPS = [0.92, 0.85, 0.75];
+
+type StageExporter = (options: {
+  mimeType: string;
+  pixelRatio: number;
+  quality?: number;
+}) => Promise<unknown>;
+
+// A photo composited at print resolution is ~26MB as PNG (measured) — past
+// every limit in the pipeline, which is exactly what made the payment step
+// fail with "design preparation failed" while a flat-colour test export
+// sailed through at 335KB. PNG is still the right container for a
+// text-only design: sharp glyph edges, and only ~0.4MB. So the format
+// follows the content, with a JPEG quality ladder as the backstop. Dropping
+// to JPEG costs nothing in fidelity here — the composite always sits on an
+// opaque white background rect, so there is no alpha to lose.
+async function exportStageToBlob(
+  toBlob: StageExporter,
+  hasRasterImage: boolean
+): Promise<Blob> {
+  if (!hasRasterImage) {
+    const png = (await toBlob({ mimeType: "image/png", pixelRatio: 1 })) as Blob | null;
+    if (png && png.size <= MAX_PRINT_FILE_BYTES) return png;
+  }
+
+  for (const quality of JPEG_QUALITY_STEPS) {
+    const jpeg = (await toBlob({
+      mimeType: "image/jpeg",
+      pixelRatio: 1,
+      quality,
+    })) as Blob | null;
+    if (jpeg && jpeg.size <= MAX_PRINT_FILE_BYTES) return jpeg;
+  }
+
+  throw new Error("export-too-large");
+}
+
 function loadHtmlImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
@@ -93,12 +137,10 @@ async function renderDesignToBlob(design: PendingDesign): Promise<Blob> {
     );
   }
 
-  // Konva's own .d.ts types toBlob as Promise<unknown> (the JS implementation
-  // returns Promise<Blob | null>) — narrow it back before returning.
-  const blob = (await stage.toBlob({
-    mimeType: "image/png",
-    pixelRatio: 1,
-  })) as Blob | null;
+  const blob = await exportStageToBlob(
+    (options) => stage.toBlob(options),
+    state.image !== null
+  );
   stage.destroy();
   if (!blob) throw new Error("export-failed");
   return blob;
@@ -135,7 +177,9 @@ export function DesignCompositor({
           const blob = await renderDesignToBlob(design);
           const formData = new FormData();
           formData.set("cartItemId", design.cartItemId);
-          formData.set("file", blob, "design.png");
+          // Name only; finalizeCartItemDesign derives the real extension by
+          // sniffing the bytes, never from what is claimed here.
+          formData.set("file", blob, blob.type === "image/jpeg" ? "design.jpg" : "design.png");
           const result = await finalizeCartItemDesign(formData);
           if ("error" in result) throw new Error(result.error);
         }
